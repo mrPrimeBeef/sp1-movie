@@ -1,15 +1,16 @@
 package app;
 
+import jakarta.persistence.EntityManagerFactory;
+
 import app.config.HibernateConfig;
 import app.services.TmdbService;
-import app.utils.Utils;
-import jakarta.persistence.EntityManagerFactory;
 
 public class Main {
     public static void main(String[] args) {
 
+        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+
         TmdbService.getDanishMoviesSince2020();
 
-        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
     }
 }
