@@ -30,7 +30,7 @@ public class TmdbService {
 
             ResponseDto responseDto = objectMapper.readValue(json, ResponseDto.class);
             for (Result r : responseDto.results) {
-                movies.add(new Movie(null, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate.toString(), null, null, null, null));
+                movies.add(new Movie(null, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null, null));
             }
 
         } catch (Exception e) {
