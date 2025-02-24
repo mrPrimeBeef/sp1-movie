@@ -17,21 +17,29 @@ public class TmdbService {
 
     public static List<Movie> getDanishMoviesSince2020() {
 
-        ArrayList<Movie> movies = new ArrayList<>(1200);
+        ArrayList<Movie> movies = new ArrayList<>(1300);
 
         String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
-        String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&language=en-US&page=1&release_date.gte=2020-01-01&sort_by=popularity.desc&api_key=" + ApiKey;
-        String json = ApiReader.getDataFromUrl(url);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
         try {
 
-            ResponseMovieDto response = objectMapper.readValue(json, ResponseMovieDto.class);
-            for (MovieResult r : response.results) {
-//                movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate.toString(), null, null, null, null));
-                movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
+            for (int page = 1; ; page++) {
+
+                String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&sort_by=popularity.desc&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
+                String json = ApiReader.getDataFromUrl(url);
+
+                ResponseMovieDto response = objectMapper.readValue(json, ResponseMovieDto.class);
+                for (MovieResult r : response.results) {
+                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
+                }
+
+                if (response.results.length < 20) {
+                    break;
+                }
+
             }
 
         } catch (Exception e) {

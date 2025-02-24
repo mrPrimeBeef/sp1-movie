@@ -15,6 +15,7 @@ public class Main {
 
         List<Movie> movies = TmdbService.getDanishMoviesSince2020();
         movies.forEach(System.out::println);
+        System.out.println(movies.size());
 
 
     }
