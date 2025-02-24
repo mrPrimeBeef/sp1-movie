@@ -13,8 +13,13 @@ public class Main {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
 
-        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
-        movies.forEach(System.out::println);
+//        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
+//        movies.forEach(System.out::println);
+
+
+        String LordOfTheRingID = "120";
+        TmdbService.getActorDto("LordOfTheRingID");
+        System.out.println(TmdbService.getDirectorDto("LordOfTheRingID"));
 
 
     }
