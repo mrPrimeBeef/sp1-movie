@@ -1,5 +1,6 @@
 package app;
 
+import app.entities.Actor;
 import app.entities.Movie;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -18,8 +19,8 @@ public class Main {
 
 
         String LordOfTheRingID = "120";
-        TmdbService.getActorDto("LordOfTheRingID");
-        System.out.println(TmdbService.getDirectorDto("LordOfTheRingID"));
+        TmdbService.getActorDto(LordOfTheRingID);
+        System.out.println(TmdbService.getDirectorDto(LordOfTheRingID));
 
 
     }

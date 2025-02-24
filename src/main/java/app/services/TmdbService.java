@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import app.entities.Actor;
 import app.entities.Director;
 import app.entities.Gender;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -67,8 +68,19 @@ public class TmdbService {
         return movieCastDto;
     }
 
+    public static Actor convertFromActorDtoToActor(ActorDto actorDto) {
+        return Actor.builder()
+                .name(actorDto.name)
+                .gender(actorDto.gender)
+                .popularity(actorDto.popularity)
+                .build();
+    }
+
     public static List<ActorDto> getActorDto(String movieID) {
         return getActorDetails(movieID).cast;
+    }
+    public static List<Actor> getActors(List<ActorDto> dto){
+        return dto.stream().map(TmdbService::convertFromActorDtoToActor).toList();
     }
 
     public static List<DirectorDto> getDirectorDto(String movieID) {
@@ -79,6 +91,18 @@ public class TmdbService {
                 .collect(Collectors.toList());
     }
 
+    public static Director convertFromDirectorDtoToDirector(DirectorDto directorDto) {
+        return Director.builder()
+                .name(directorDto.name)
+                .gender(directorDto.gender)
+                .popularity(directorDto.popularity)
+                .build();
+    }
+
+    public static List<Director> getDirectors(List<DirectorDto> dto){
+        return dto.stream().map(TmdbService::convertFromDirectorDtoToDirector).toList();
+    }
+
     private record MovieCastDto(
             Long id,
             List<ActorDto> cast,
@@ -87,7 +111,6 @@ public class TmdbService {
     }
 
     public record DirectorDto(
-            Long id,
             String name,
             Gender gender,
             String job,
@@ -95,7 +118,6 @@ public class TmdbService {
     }
 
     private record ActorDto(
-            Long id,
             String name,
             Gender gender,
             double popularity,
