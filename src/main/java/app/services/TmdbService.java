@@ -28,8 +28,8 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
 
-            ResponseDto responseDto = objectMapper.readValue(json, ResponseDto.class);
-            for (Result r : responseDto.results) {
+            ResponseMovieDto responseDto = objectMapper.readValue(json, ResponseMovieDto.class);
+            for (MovieResult r : responseDto.results) {
                 movies.add(new Movie(null, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate.toString(), null, null, null, null));
             }
 
@@ -43,10 +43,12 @@ public class TmdbService {
     }
 
 
-    private record ResponseDto(Result[] results) {
+    private record ResponseMovieDto(MovieResult[] results) {
     }
 
-    private record Result(String title,
+    private record MovieResult(@JsonProperty("id")
+                          Long tmpdId,
+                          String title,
                           @JsonProperty("original_title")
                           String originalTitle,
                           Boolean adult,
