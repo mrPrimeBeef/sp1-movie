@@ -28,9 +28,10 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
 
-            ResponseMovieDto responseDto = objectMapper.readValue(json, ResponseMovieDto.class);
-            for (MovieResult r : responseDto.results) {
-                movies.add(new Movie(null, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate.toString(), null, null, null, null));
+            ResponseMovieDto response = objectMapper.readValue(json, ResponseMovieDto.class);
+            for (MovieResult r : response.results) {
+//                movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate.toString(), null, null, null, null));
+                movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
             }
 
         } catch (Exception e) {
@@ -47,19 +48,19 @@ public class TmdbService {
     }
 
     private record MovieResult(@JsonProperty("id")
-                          Long tmpdId,
-                          String title,
-                          @JsonProperty("original_title")
-                          String originalTitle,
-                          Boolean adult,
-                          @JsonProperty("original_language")
-                          String originalLanguage,
-                          Double popularity,
-                          @JsonProperty("release_date")
-                          LocalDate releaseDate,
-                          @JsonProperty("genre_ids")
-                          int[] genreIds,
-                          String overview) {
+                               Integer tmdbId,
+                               String title,
+                               @JsonProperty("original_title")
+                               String originalTitle,
+                               Boolean adult,
+                               @JsonProperty("original_language")
+                               String originalLanguage,
+                               Double popularity,
+                               @JsonProperty("release_date")
+                               LocalDate releaseDate,
+                               @JsonProperty("genre_ids")
+                               int[] genreIds,
+                               String overview) {
     }
 
 

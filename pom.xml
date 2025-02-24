@@ -17,12 +17,11 @@
         <junit.version>5.11.4</junit.version>
         <postgres.version>42.7.5</postgres.version>
         <lombok.version>1.18.36</lombok.version>
-        <jackson2.version>2.16.0</jackson2.version>
+        <jackson.version>2.16.0</jackson.version>
         <testcontainers.version>1.20.4</testcontainers.version>
         <logback-classic>1.5.16</logback-classic>
         <org.slf4j>2.0.16</org.slf4j>
         <hamcrest>3.0</hamcrest>
-
     </properties>
 
     <dependencies>
@@ -30,13 +29,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson2.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson2.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <!--  DB    -->
         <dependency>
