@@ -6,10 +6,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,10 +27,7 @@ public class Movie {
     private boolean adult;
     private String originalLanguage;
     private double popularity;
-    private String releaseDate;
-
-    @ManyToMany
-    private List<Actor> actors;
+    private LocalDate releaseDate;
 
     @ManyToMany
     private List<Director> directors;
