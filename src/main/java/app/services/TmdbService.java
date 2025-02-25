@@ -43,17 +43,12 @@ public class TmdbService {
                 if (response.movieResults.length < 20) {
                     break;
                 }
-
             }
-
             return movies;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
-
     }
 
     private static MovieCastDto getActorDetails(String movieId) {
@@ -89,7 +84,8 @@ public class TmdbService {
     public static List<ActorDto> getActorDto(String movieID) {
         return getActorDetails(movieID).cast;
     }
-    public static List<Actor> getActors(List<ActorDto> dto){
+
+    public static List<Actor> getActors(List<ActorDto> dto) {
         return dto.stream().map(TmdbService::convertFromActorDtoToActor).toList();
     }
 
@@ -136,12 +132,12 @@ public class TmdbService {
 
     private record MovieResponseDto(MovieResult[] movieResults) {
     }
-
     private record MovieResult(@JsonProperty("id")
                                Integer tmdbId,
                                String title,
                                @JsonProperty("original_title")
                                String originalTitle,
+                               String overview,
                                Boolean adult,
                                @JsonProperty("original_language")
                                String originalLanguage,
@@ -149,7 +145,7 @@ public class TmdbService {
                                @JsonProperty("release_date")
                                LocalDate releaseDate,
                                @JsonProperty("genre_ids")
-                               int[] genreIds,
-                               String overview) {
+                               int[] genreIds
+                               ) {
     }
 }
