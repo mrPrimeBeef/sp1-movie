@@ -1,27 +1,23 @@
 package app;
 
-import app.entities.Actor;
-import app.entities.Movie;
+import java.util.Comparator;
+import java.util.List;
+
 import jakarta.persistence.EntityManagerFactory;
 
 import app.config.HibernateConfig;
+import app.entities.Movie;
 import app.services.TmdbService;
-
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
 
-//        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
-//        movies.forEach(System.out::println);
-
-
-        String LordOfTheRingID = "120";
-        TmdbService.getActorDto(LordOfTheRingID);
-        System.out.println(TmdbService.getDirectorDto(LordOfTheRingID));
-
+        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
+        movies.stream()
+                .sorted(Comparator.comparing(Movie::getReleaseDate))
+                .forEach(System.out::println);
 
     }
 }

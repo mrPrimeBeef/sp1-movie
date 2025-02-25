@@ -21,28 +21,38 @@ public class TmdbService {
 
     public static List<Movie> getDanishMoviesSince2020() {
 
-        ArrayList<Movie> movies = new ArrayList<>(1200);
+        ArrayList<Movie> movies = new ArrayList<>(1300);
 
         String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
-        String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&language=en-US&page=1&release_date.gte=2020-01-01&sort_by=popularity.desc&api_key=" + ApiKey;
-        String json = ApiReader.getDataFromUrl(url);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
         try {
 
-            MovieResponseDto movieResponseDto = objectMapper.readValue(json, MovieResponseDto.class);
-//            for (MovieResult r : movieResponseDto.movieResults) {
-//                movies.add(new Movie(null, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null, null));
-//            }
+            for (int page = 1; ; page++) {
+
+                String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
+                String json = ApiReader.getDataFromUrl(url);
+
+                ResponseMovieDto response = objectMapper.readValue(json, ResponseMovieDto.class);
+                for (MovieResult r : response.results) {
+                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
+                }
+
+                if (response.results.length < 20) {
+                    break;
+                }
+
+            }
+
+            return movies;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
 
-        return movies;
+        return null;
 
     }
 
@@ -101,6 +111,7 @@ public class TmdbService {
 
     public static List<Director> getDirectors(List<DirectorDto> dto){
         return dto.stream().map(TmdbService::convertFromDirectorDtoToDirector).toList();
+    private record ResponseMovieDto(MovieResult[] results) {
     }
 
     private record MovieCastDto(
@@ -128,6 +139,20 @@ public class TmdbService {
     }
 
     private record MovieResult(String title,
+                               @JsonProperty("original_title")
+                               String originalTitle,
+                               Boolean adult,
+                               @JsonProperty("original_language")
+                               String originalLanguage,
+                               Double popularity,
+                               @JsonProperty("release_date")
+                               LocalDate releaseDate,
+                               @JsonProperty("genre_ids")
+                               int[] genreIds,
+                               String overview) {
+    private record MovieResult(@JsonProperty("id")
+                               Integer tmdbId,
+                               String title,
                                @JsonProperty("original_title")
                                String originalTitle,
                                Boolean adult,
