@@ -37,7 +37,7 @@ public class TmdbService {
 
                 MovieResponseDto response = objectMapper.readValue(json, MovieResponseDto.class);
                 for (MovieResult r : response.results) {
-                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
+                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, null, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
                 }
 
                 if (response.results.length < 20) {

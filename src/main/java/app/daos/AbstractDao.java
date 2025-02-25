@@ -1,9 +1,9 @@
 package app.daos;
 
+import java.util.List;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-
-import java.util.List;
 
 public abstract class AbstractDao<T, I> {
 
