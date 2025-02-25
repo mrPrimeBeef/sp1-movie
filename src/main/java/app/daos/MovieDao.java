@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import app.entities.Movie;
 
-public class MovieDao extends AbstractDao<Movie, Long> {
+public class MovieDao extends AbstractDao<Movie, Integer> {
 
     private static MovieDao instance;
 

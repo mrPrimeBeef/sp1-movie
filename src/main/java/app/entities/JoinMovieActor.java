@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class JoinMovieActor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)

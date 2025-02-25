@@ -23,13 +23,12 @@ public class Main {
         ActorDao actorDao = ActorDao.getInstance(emf);
 
         List<Genre> genres = TmdbService.getAllGenres();
-        genres.forEach(System.out::println);
         genres.forEach(genreDao::create);
-        genres.forEach(System.out::println);
 
-//        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
-//
-//        movies.forEach(movieDao::create);
+
+        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
+        movies.forEach(movieDao::create);
+
 //
 //        HashSet<Actor> allActorsInAllMovies = new HashSet<>();
 //

@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import app.entities.Actor;
 
-public class ActorDao extends AbstractDao<Actor, Long> {
+public class ActorDao extends AbstractDao<Actor, Integer> {
 
     private static ActorDao instance;
 
