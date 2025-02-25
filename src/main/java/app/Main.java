@@ -1,19 +1,18 @@
 package app;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
-import app.daos.GenreeDao;
-import app.entities.Genree;
-import app.daos.ActorDao;
-import app.daos.MovieDao;
-import app.entities.Actor;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.config.HibernateConfig;
 import app.entities.Movie;
 import app.services.TmdbService;
+import app.daos.GenreeDao;
+import app.entities.Genree;
+import app.daos.ActorDao;
+import app.daos.MovieDao;
+import app.entities.Actor;
 
 public class Main {
     public static void main(String[] args) {
