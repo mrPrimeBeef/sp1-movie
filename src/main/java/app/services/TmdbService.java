@@ -124,6 +124,8 @@ public class TmdbService {
     }
 
     private record ActorDto(
+            @JsonProperty("id")
+            Integer tmdbId,
             String name,
             Gender gender,
             double popularity,

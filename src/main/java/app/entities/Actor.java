@@ -18,6 +18,8 @@ public class Actor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Integer tmdbId;
+
     private String name;
 
     @Enumerated(EnumType.STRING)
