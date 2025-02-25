@@ -3,6 +3,7 @@ package app.services;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,7 +20,7 @@ public class TmdbService {
 
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
-    public static List<Movie> getDanishMoviesSince2020() {
+    public static List<Movie> getDanishMoviesSince2020(Map<Integer, Genre> genreMap) {
 
         ArrayList<Movie> movies = new ArrayList<>(1300);
 
@@ -29,14 +30,21 @@ public class TmdbService {
         try {
 
             // TODO: Husk at slette page limit til 3 og husk at få skrevet overview ned til databasen
-            for (int page = 1; page<3; page++) {
+            for (int page = 1; ; page++) {
 
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
 
                 MovieResponseDto response = objectMapper.readValue(json, MovieResponseDto.class);
                 for (MovieResult r : response.results) {
-                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, null, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
+
+                    // Use genreMap to go from tmdbId to Genre entity
+                    List<Genre> genres = new ArrayList<>();
+                    for (Integer tmdbId : r.genreIds) {
+                        genres.add(genreMap.get(tmdbId));
+                    }
+
+                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, null, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, genres));
                 }
 
                 if (response.results.length < 20) {
@@ -181,7 +189,7 @@ public class TmdbService {
                                @JsonProperty("release_date")
                                LocalDate releaseDate,
                                @JsonProperty("genre_ids")
-                               int[] genreIds
+                               List<Integer> genreIds
     ) {
     }
 }
