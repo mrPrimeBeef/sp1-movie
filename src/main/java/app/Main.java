@@ -8,8 +8,8 @@ import jakarta.persistence.EntityManagerFactory;
 import app.config.HibernateConfig;
 import app.entities.Movie;
 import app.services.TmdbService;
-import app.daos.GenreeDao;
-import app.entities.Genree;
+import app.daos.GenreDao;
+import app.entities.Genre;
 import app.daos.ActorDao;
 import app.daos.MovieDao;
 import app.entities.Actor;
@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
-        GenreeDao genreeDao = GenreeDao.getInstance(emf);
+        GenreDao genreDao = GenreDao.getInstance(emf);
         MovieDao movieDao = MovieDao.getInstance(emf);
         ActorDao actorDao = ActorDao.getInstance(emf);
 
@@ -42,8 +42,8 @@ public class Main {
 
 
         TmdbService.GenresResponseDto list = TmdbService.getAllGenres();
-        List<Genree> list2 = TmdbService.getGenres(list.genres());
-        list2.forEach(genreeDao::create);
+        List<Genre> list2 = TmdbService.getGenres(list.genres());
+        list2.forEach(genreDao::create);
 
     }
 }

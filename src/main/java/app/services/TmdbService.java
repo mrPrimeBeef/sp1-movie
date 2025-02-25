@@ -5,14 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import app.entities.*;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import app.entities.*;
 import app.utils.ApiReader;
 import app.utils.Utils;
+
 
 public class TmdbService {
 
@@ -89,14 +91,14 @@ public class TmdbService {
         return genresResponseDto;
     }
 
-    public static Genree convertFromGenreDtoToGenre(GenreDto genreDto) {
-        return Genree.builder()
+    public static Genre convertFromGenreDtoToGenre(GenreDto genreDto) {
+        return Genre.builder()
                 .id(genreDto.id())
                 .name(genreDto.name)
                 .build();
     }
 
-    public static List<Genree> getGenres(List<GenreDto> dtos){
+    public static List<Genre> getGenres(List<GenreDto> dtos) {
         return dtos.stream().map(TmdbService::convertFromGenreDtoToGenre).toList();
     }
 
@@ -137,13 +139,13 @@ public class TmdbService {
     }
 
     public record GenresResponseDto(@JsonProperty("genres")
-                                     List<GenreDto> genres) {
+                                    List<GenreDto> genres) {
     }
 
     public record GenreDto(@JsonProperty("id")
-                            Integer id,
-                            @JsonProperty("name")
-                            String name) {
+                           Integer id,
+                           @JsonProperty("name")
+                           String name) {
     }
 
     private record MovieCastDto(

@@ -1,14 +1,15 @@
 package app.config;
 
-import app.entities.*;
-import app.utils.Utils;
+import java.util.Properties;
+
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
-import java.util.Properties;
+import app.entities.*;
+import app.utils.Utils;
 
 public class HibernateConfig {
 
@@ -43,7 +44,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Actor.class);
         configuration.addAnnotatedClass(Director.class);
         configuration.addAnnotatedClass(Movie.class);
-        configuration.addAnnotatedClass(app.entities.Genree.class);
+        configuration.addAnnotatedClass(Genre.class);
         configuration.addAnnotatedClass(JoinMovieActor.class);
 
     }
