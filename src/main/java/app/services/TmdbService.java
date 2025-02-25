@@ -36,11 +36,11 @@ public class TmdbService {
                 String json = ApiReader.getDataFromUrl(url);
 
                 MovieResponseDto response = objectMapper.readValue(json, MovieResponseDto.class);
-                for (MovieResult r : response.movieResults) {
+                for (MovieResult r : response.results) {
                     movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
                 }
 
-                if (response.movieResults.length < 20) {
+                if (response.results.length < 20) {
                     break;
                 }
             }
@@ -130,7 +130,7 @@ public class TmdbService {
             String character) {
     }
 
-    private record MovieResponseDto(MovieResult[] movieResults) {
+    private record MovieResponseDto(MovieResult[] results) {
     }
     private record MovieResult(@JsonProperty("id")
                                Integer tmdbId,
