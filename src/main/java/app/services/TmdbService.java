@@ -35,12 +35,12 @@ public class TmdbService {
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
 
-                ResponseMovieDto response = objectMapper.readValue(json, ResponseMovieDto.class);
-                for (MovieResult r : response.results) {
+                MovieResponseDto response = objectMapper.readValue(json, MovieResponseDto.class);
+                for (MovieResult r : response.movieResults) {
                     movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, null));
                 }
 
-                if (response.results.length < 20) {
+                if (response.movieResults.length < 20) {
                     break;
                 }
 
@@ -109,9 +109,8 @@ public class TmdbService {
                 .build();
     }
 
-    public static List<Director> getDirectors(List<DirectorDto> dto){
+    public static List<Director> getDirectors(List<DirectorDto> dto) {
         return dto.stream().map(TmdbService::convertFromDirectorDtoToDirector).toList();
-    private record ResponseMovieDto(MovieResult[] results) {
     }
 
     private record MovieCastDto(
@@ -138,18 +137,6 @@ public class TmdbService {
     private record MovieResponseDto(MovieResult[] movieResults) {
     }
 
-    private record MovieResult(String title,
-                               @JsonProperty("original_title")
-                               String originalTitle,
-                               Boolean adult,
-                               @JsonProperty("original_language")
-                               String originalLanguage,
-                               Double popularity,
-                               @JsonProperty("release_date")
-                               LocalDate releaseDate,
-                               @JsonProperty("genre_ids")
-                               int[] genreIds,
-                               String overview) {
     private record MovieResult(@JsonProperty("id")
                                Integer tmdbId,
                                String title,
