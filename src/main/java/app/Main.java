@@ -22,28 +22,31 @@ public class Main {
         MovieDao movieDao = MovieDao.getInstance(emf);
         ActorDao actorDao = ActorDao.getInstance(emf);
 
-        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
+        List<Genre> genres = TmdbService.getAllGenres();
+        genres.forEach(System.out::println);
+        genres.forEach(genreDao::create);
+        genres.forEach(System.out::println);
 
-        movies.forEach(movieDao::create);
+//        List<Movie> movies = TmdbService.getDanishMoviesSince2020();
+//
+//        movies.forEach(movieDao::create);
+//
+//        HashSet<Actor> allActorsInAllMovies = new HashSet<>();
+//
+//        for (Movie movie : movies) {
+//
+//            List<Actor> actorsInThisMovie = TmdbService.getActors(TmdbService.getActorDto(movie.getTmdbId().toString()));
+//
+//            for (Actor actor : actorsInThisMovie) {
+//                allActorsInAllMovies.add(actor);
+//            }
+//
+//        }
+//
+//        allActorsInAllMovies.forEach(System.out::println);
 
-        HashSet<Actor> allActorsInAllMovies = new HashSet<>();
 
-        for (Movie movie : movies) {
-
-            List<Actor> actorsInThisMovie = TmdbService.getActors(TmdbService.getActorDto(movie.getTmdbId().toString()));
-
-            for (Actor actor : actorsInThisMovie) {
-                allActorsInAllMovies.add(actor);
-            }
-
-        }
-
-        allActorsInAllMovies.forEach(System.out::println);
-
-
-        TmdbService.GenresResponseDto list = TmdbService.getAllGenres();
-        List<Genre> list2 = TmdbService.getGenres(list.genres());
-        list2.forEach(genreDao::create);
+        emf.close();
 
     }
 }

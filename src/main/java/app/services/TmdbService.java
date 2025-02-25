@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +28,7 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
 
-            for (int page = 1; ; page++) {
+            for (int page = 1; page < 3; page++) {
 
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
@@ -72,8 +71,29 @@ public class TmdbService {
         return movieCastDto;
     }
 
-    public static GenresResponseDto getAllGenres() {
-        GenresResponseDto genresResponseDto = null;
+//    public static GenresResponseDto getAllGenres() {
+//        GenresResponseDto genresResponseDto = null;
+//
+//        String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
+//        String url = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + ApiKey;
+//        String json = ApiReader.getDataFromUrl(url);
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//
+//        try {
+//            genresResponseDto = objectMapper.readValue(json, GenresResponseDto.class);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return genresResponseDto;
+//    }
+
+
+    public static List<Genre> getAllGenres() {
+
+        ArrayList<Genre> genres = new ArrayList<>();
 
         String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
         String url = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + ApiKey;
@@ -83,24 +103,29 @@ public class TmdbService {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            genresResponseDto = objectMapper.readValue(json, GenresResponseDto.class);
+            GenresResponseDto genresResponseDto = objectMapper.readValue(json, GenresResponseDto.class);
+            for (GenresResponseDto.GenreDto g : genresResponseDto.genres) {
+                genres.add(new Genre(null, g.tmdbId, g.name));
+            }
+
+            return genres;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return genresResponseDto;
+        return null;
     }
 
-    public static Genre convertFromGenreDtoToGenre(GenreDto genreDto) {
-        return Genre.builder()
-                .id(genreDto.id())
-                .name(genreDto.name)
-                .build();
-    }
+//    public static Genre convertFromGenreDtoToGenre(GenreDto genreDto) {
+//        return Genre.builder()
+//                .id(genreDto.id())
+//                .name(genreDto.name)
+//                .build();
+//    }
 
-    public static List<Genre> getGenres(List<GenreDto> dtos) {
-        return dtos.stream().map(TmdbService::convertFromGenreDtoToGenre).toList();
-    }
+//    public static List<Genre> getGenres(List<GenreDto> dtos) {
+//        return dtos.stream().map(TmdbService::convertFromGenreDtoToGenre).toList();
+//    }
 
     public static Actor convertFromActorDtoToActor(ActorDto actorDto) {
         return Actor.builder()
@@ -138,15 +163,16 @@ public class TmdbService {
         return dto.stream().map(TmdbService::convertFromDirectorDtoToDirector).toList();
     }
 
-    public record GenresResponseDto(@JsonProperty("genres")
-                                    List<GenreDto> genres) {
+    private record GenresResponseDto(List<GenreDto> genres) {
+
+        private record GenreDto(@JsonProperty("id")
+                                Integer tmdbId,
+                                String name) {
+        }
+
     }
 
-    public record GenreDto(@JsonProperty("id")
-                           Integer id,
-                           @JsonProperty("name")
-                           String name) {
-    }
+
 
     private record MovieCastDto(
             Long id,
