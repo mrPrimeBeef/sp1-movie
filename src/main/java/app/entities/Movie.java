@@ -35,5 +35,5 @@ public class Movie {
     private Set<JoinMovieActor> joins = new HashSet<>();
 
     @ManyToMany
-    private List<Genre> genrees;
+    private List<Genre> genres;
 }
