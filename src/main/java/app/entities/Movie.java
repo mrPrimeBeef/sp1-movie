@@ -34,9 +34,6 @@ public class Movie {
     @OneToMany(mappedBy = "movie")
     private Set<JoinMovieActor> joins = new HashSet<>();
 
-    @ElementCollection(targetClass = Genre.class) //  JPA laver en separat tabel for ENUM-lister.
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "movie_genre", joinColumns = @JoinColumn(name = "movie_id")) // Opretter en tabel movie_genre med en foreign key til movie_id.Tabellen indeholder en liste af Genre-værdier for hver film.
-    @Column(name = "genre") // Angiver kolonnen, hvor ENUM-værdierne gemmes.
-    private List<Genre> genres;
+    @ManyToMany
+    private List<Genree> genrees;
 }

@@ -5,15 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import app.entities.Actor;
-import app.entities.Director;
-import app.entities.Gender;
+import app.entities.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import app.entities.Movie;
 import app.utils.ApiReader;
 import app.utils.Utils;
 
@@ -51,7 +48,7 @@ public class TmdbService {
         return null;
     }
 
-    private static MovieCastDto getActorDetails(String movieId) {
+    private static MovieCastDto getCrewAndActorsDetails(String movieId) {
 
         MovieCastDto movieCastDto = null;
 
@@ -73,6 +70,36 @@ public class TmdbService {
         return movieCastDto;
     }
 
+    public static GenresResponseDto getAllGenres() {
+        GenresResponseDto genresResponseDto = null;
+
+        String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
+        String url = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + ApiKey;
+        String json = ApiReader.getDataFromUrl(url);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        try {
+            genresResponseDto = objectMapper.readValue(json, GenresResponseDto.class);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return genresResponseDto;
+    }
+
+    public static Genree convertFromGenreDtoToGenre(GenreDto genreDto) {
+        return Genree.builder()
+                .id(genreDto.id())
+                .name(genreDto.name)
+                .build();
+    }
+
+    public static List<Genree> getGenres(List<GenreDto> dtos){
+        return dtos.stream().map(TmdbService::convertFromGenreDtoToGenre).toList();
+    }
+
     public static Actor convertFromActorDtoToActor(ActorDto actorDto) {
         return Actor.builder()
                 .name(actorDto.name)
@@ -82,7 +109,7 @@ public class TmdbService {
     }
 
     public static List<ActorDto> getActorDto(String movieID) {
-        return getActorDetails(movieID).cast;
+        return getCrewAndActorsDetails(movieID).cast;
     }
 
     public static List<Actor> getActors(List<ActorDto> dto) {
@@ -90,7 +117,7 @@ public class TmdbService {
     }
 
     public static List<DirectorDto> getDirectorDto(String movieID) {
-        List<DirectorDto> list = getActorDetails(movieID).crew;
+        List<DirectorDto> list = getCrewAndActorsDetails(movieID).crew;
         return list
                 .stream()
                 .filter(person -> "Director".equals(person.job()))
@@ -107,6 +134,16 @@ public class TmdbService {
 
     public static List<Director> getDirectors(List<DirectorDto> dto) {
         return dto.stream().map(TmdbService::convertFromDirectorDtoToDirector).toList();
+    }
+
+    public record GenresResponseDto(@JsonProperty("genres")
+                                     List<GenreDto> genres) {
+    }
+
+    public record GenreDto(@JsonProperty("id")
+                            Integer id,
+                            @JsonProperty("name")
+                            String name) {
     }
 
     private record MovieCastDto(
@@ -134,6 +171,7 @@ public class TmdbService {
 
     private record MovieResponseDto(MovieResult[] results) {
     }
+
     private record MovieResult(@JsonProperty("id")
                                Integer tmdbId,
                                String title,
@@ -148,6 +186,6 @@ public class TmdbService {
                                LocalDate releaseDate,
                                @JsonProperty("genre_ids")
                                int[] genreIds
-                               ) {
+    ) {
     }
 }

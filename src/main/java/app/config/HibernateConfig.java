@@ -43,7 +43,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Actor.class);
         configuration.addAnnotatedClass(Director.class);
         configuration.addAnnotatedClass(Movie.class);
-        configuration.addAnnotatedClass(Genre.class);
+        configuration.addAnnotatedClass(app.entities.Genree.class);
         configuration.addAnnotatedClass(JoinMovieActor.class);
 
     }
