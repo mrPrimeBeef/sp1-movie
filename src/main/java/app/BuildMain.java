@@ -16,7 +16,7 @@ import app.daos.ActorDao;
 import app.daos.MovieDao;
 import app.entities.Actor;
 
-public class Main {
+public class BuildMain {
     public static void main(String[] args) {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
@@ -36,8 +36,6 @@ public class Main {
         List<Movie> movies = TmdbService.getDanishMoviesSince2020(genreMap);
         movies.forEach(movieDao::create);
 
-
-
         // TODO: Gør sådan at tmdbId for actors ikke er null
         HashSet<Actor> allActorsInAllMovies = new HashSet<>();
 
@@ -50,13 +48,7 @@ public class Main {
             }
 
         }
-
         allActorsInAllMovies.forEach(System.out::println);
-
-
-
-
         emf.close();
-
     }
 }
