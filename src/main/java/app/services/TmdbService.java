@@ -1,20 +1,20 @@
 package app.services;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.util.*;
 
-import app.config.HibernateConfig;
-import app.daos.DirectorDao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.persistence.EntityManagerFactory;
 
 import app.entities.*;
 import app.utils.ApiReader;
 import app.utils.Utils;
-import jakarta.persistence.EntityManagerFactory;
+import app.config.HibernateConfig;
+import app.daos.DirectorDao;
+import app.daos.ActorDao;
 
 
 public class TmdbService {
@@ -22,6 +22,7 @@ public class TmdbService {
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
     private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+    private static final ActorDao actorDao = ActorDao.getInstance(emf);
     private static final DirectorDao directorDao = DirectorDao.getInstance(emf);
 
     public static void shutdown() {
@@ -77,6 +78,19 @@ public class TmdbService {
         try {
             CreditsResponseDto response = objectMapper.readValue(json, CreditsResponseDto.class);
 
+            HashSet<Actor> actors = new HashSet<>();
+
+            for (ActorDto a : response.cast) {
+
+                Actor actor = actorDao.findById(a.id);
+                if (actor == null) {
+                    actor = actorDao.create(new Actor(a.id, a.name, a.gender, a.popularity, null));
+                }
+
+                actors.add(actor);
+            }
+
+
             HashSet<Director> directors = new HashSet<>();
 
             for (DirectorDto d : response.crew) {
@@ -88,11 +102,12 @@ public class TmdbService {
                     }
 
                     directors.add(director);
-
                 }
             }
 
             movie.setDirectors(directors);
+            // TODO: Fix this so it works
+//            movie.setActors(actors);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,33 +142,6 @@ public class TmdbService {
         return null;
     }
 
-
-//    public static List<Actor> getActorsForMovie(int tmdbMovieId) {
-//
-//        CreditsResponseDto creditsResponseDto = getCreditsForMovie(tmdbMovieId);
-//
-//        List<Actor> actors = new LinkedList<>();
-//        for (ActorDto a : creditsResponseDto.cast) {
-//            actors.add(new Actor(a.id, a.name, a.gender, a.popularity, null));
-//        }
-//
-//        return actors;
-//    }
-
-//    public static List<Director> getDirectorsForMovie(int tmdbMovieId) {
-//
-//        CreditsResponseDto creditsResponseDto = getCreditsForMovie(tmdbMovieId);
-//
-//        List<Director> directors = new LinkedList<>();
-//        for (DirectorDto d : creditsResponseDto.crew) {
-//            if (d.job.equals("Director")) {
-//                directors.add(new Director(d.tmdbId, d.name, d.gender, d.popularity, null));
-//            }
-//
-//        }
-//
-//        return directors;
-//    }
 
     private record CreditsResponseDto(
             List<ActorDto> cast,
