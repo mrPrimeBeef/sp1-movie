@@ -36,8 +36,6 @@ public class BuildMain {
         List<Movie> movies = TmdbService.getDanishMoviesSince2020(genreMap);
         movies.forEach(movieDao::create);
 
-
-
         // TODO: Gør sådan at tmdbId for actors ikke er null
         HashSet<Actor> allActorsInAllMovies = new HashSet<>();
 
@@ -50,13 +48,7 @@ public class BuildMain {
             }
 
         }
-
         allActorsInAllMovies.forEach(System.out::println);
-
-
-
-
         emf.close();
-
     }
 }
