@@ -16,7 +16,7 @@ import app.daos.ActorDao;
 import app.daos.MovieDao;
 import app.entities.Actor;
 
-public class Main {
+public class BuildMain {
     public static void main(String[] args) {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
