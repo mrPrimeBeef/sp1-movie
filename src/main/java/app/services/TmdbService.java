@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -44,7 +43,7 @@ public class TmdbService {
                         genres.add(genreMap.get(tmdbId));
                     }
 
-                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, genres));
+                    movies.add(new Movie(r.id, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, genres));
                 }
 
                 if (response.results.length < 20) {
@@ -92,7 +91,7 @@ public class TmdbService {
 
             GenresResponseDto response = objectMapper.readValue(json, GenresResponseDto.class);
             for (GenreDto g : response.genres) {
-                genres.add(new Genre(null, g.tmdbId, g.name));
+                genres.add(new Genre(g.id, g.name));
             }
 
             return genres;
@@ -111,7 +110,7 @@ public class TmdbService {
 
         List<Actor> actors = new LinkedList<>();
         for (ActorDto a : creditsResponseDto.cast) {
-            actors.add(new Actor(null, a.tmdbId, a.name, a.gender, a.popularity, null));
+            actors.add(new Actor(a.id, a.name, a.gender, a.popularity, null));
         }
 
         return actors;
@@ -123,8 +122,8 @@ public class TmdbService {
 
         List<Director> directors = new LinkedList<>();
         for (DirectorDto d : creditsResponseDto.crew) {
-            if(d.job.equals("Director")){
-                directors.add(new Director(null, d.tmdbId, d.name, d.gender, d.popularity, null));
+            if (d.job.equals("Director")) {
+                directors.add(new Director(d.tmdbId, d.name, d.gender, d.popularity, null));
             }
 
         }
@@ -132,36 +131,13 @@ public class TmdbService {
         return directors;
     }
 
-
-//    public static List<DirectorDto> getDirectorDto(int movieID) {
-//        List<DirectorDto> list = getCreditsForMovie(movieID).crew;
-//        return list
-//                .stream()
-//                .filter(person -> "Director".equals(person.job()))
-//                .collect(Collectors.toList());
-//    }
-//
-//    public static Director convertFromDirectorDtoToDirector(DirectorDto directorDto) {
-//        return Director.builder()
-//                .name(directorDto.name)
-//                .gender(directorDto.gender)
-//                .popularity(directorDto.popularity)
-//                .build();
-//    }
-//
-//    public static List<Director> getDirectors(List<DirectorDto> dto) {
-//        return dto.stream().map(TmdbService::convertFromDirectorDtoToDirector).toList();
-//    }
-
-
     private record CreditsResponseDto(
             List<ActorDto> cast,
             List<DirectorDto> crew) {
     }
 
     private record ActorDto(
-            @JsonProperty("id")
-            Integer tmdbId,
+            Integer id,
             String name,
             Gender gender,
             double popularity,
@@ -181,8 +157,7 @@ public class TmdbService {
     private record MovieResponseDto(MovieResult[] results) {
     }
 
-    private record MovieResult(@JsonProperty("id")
-                               Integer tmdbId,
+    private record MovieResult(Integer id,
                                String title,
                                @JsonProperty("original_title")
                                String originalTitle,
@@ -201,8 +176,7 @@ public class TmdbService {
     private record GenresResponseDto(List<GenreDto> genres) {
     }
 
-    private record GenreDto(@JsonProperty("id")
-                            Integer tmdbId,
+    private record GenreDto(Integer id,
                             String name) {
     }
 

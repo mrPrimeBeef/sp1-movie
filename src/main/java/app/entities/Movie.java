@@ -16,10 +16,8 @@ import lombok.*;
 @Entity
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer tmdbId;
     private String title;
     private String originalTitle;
 

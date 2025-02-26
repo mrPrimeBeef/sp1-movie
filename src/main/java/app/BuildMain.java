@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import app.entities.Director;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.config.HibernateConfig;
+import app.entities.Director;
 import app.entities.Movie;
 import app.services.TmdbService;
 import app.daos.GenreDao;
@@ -29,9 +29,9 @@ public class BuildMain {
         List<Genre> genres = TmdbService.getAllGenres();
         genres.forEach(genreDao::create);
 
-        // Create genreMap between tmdbId and Genre
+        // Create genreMap between id and Genre
         Map<Integer, Genre> genreMap = new HashMap<>();
-        genres.forEach(g -> genreMap.put(g.getTmdbId(), g));
+        genres.forEach(g -> genreMap.put(g.getId(), g));
 
         // Get all movies from TMDB - we need genreMap to put genre entity inside movie entity
         List<Movie> movies = TmdbService.getDanishMoviesSince2020(genreMap);
@@ -43,12 +43,12 @@ public class BuildMain {
 
         for (Movie movie : movies) {
 
-            List<Actor> actorsInThisMovie = TmdbService.getActorsForMovie(movie.getTmdbId());
+            List<Actor> actorsInThisMovie = TmdbService.getActorsForMovie(movie.getId());
             for (Actor actor : actorsInThisMovie) {
                 allActorsInAllMovies.add(actor);
             }
 
-            List<Director> directorsInThisMovie = TmdbService.getDirectorsForMovie(movie.getTmdbId());
+            List<Director> directorsInThisMovie = TmdbService.getDirectorsForMovie(movie.getId());
             for (Director director : directorsInThisMovie) {
                 allDirectorsInAllMovies.add(director);
             }

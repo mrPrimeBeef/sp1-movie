@@ -15,10 +15,7 @@ import lombok.*;
 @Entity
 public class Actor {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    private Integer tmdbId;
 
     private String name;
 
