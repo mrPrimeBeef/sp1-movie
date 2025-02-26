@@ -31,12 +31,15 @@ public class Movie {
     private double popularity;
     private LocalDate releaseDate;
 
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Director> directors;
 
-    @OneToMany(mappedBy = "movie")
+
+    @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
     private Set<JoinMovieActor> joins = new HashSet<>();
 
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Genre> genres;
 }

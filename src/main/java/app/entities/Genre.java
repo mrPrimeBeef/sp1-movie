@@ -14,7 +14,9 @@ import lombok.*;
 public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ToString.Exclude
     Integer id;
+    @ToString.Exclude
     Integer tmdbId;
     String name;
 }
