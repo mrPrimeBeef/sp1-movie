@@ -1,12 +1,12 @@
 package app.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
+@ToString
+@EqualsAndHashCode
 @Getter
 @Builder
 @NoArgsConstructor
@@ -17,6 +17,8 @@ public class Director {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    String tmdbId;
+
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -24,6 +26,7 @@ public class Director {
 
     private double popularity;
 
-    @ManyToMany(mappedBy = "directors")
+    @ToString.Exclude
+    @ManyToMany(mappedBy = "directors", fetch = FetchType.EAGER)
     private List<Movie> movies;
 }

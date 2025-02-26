@@ -17,6 +17,8 @@ import app.utils.Utils;
 
 
 public class TmdbService {
+//    private static List<ActorDto> actorDtos;
+//    private static List<DirectorDto> directorDtos;
 
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
@@ -29,7 +31,7 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // TODO: HUsk at slette page<2
-            for (int page = 1; page<2; page++) {
+            for (int page = 1; page < 2; page++) {
 
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
@@ -57,11 +59,10 @@ public class TmdbService {
         return null;
     }
 
-    private static MovieCastDto getCrewAndActorsDetails(String movieId) {
+    public static MovieCastDTO getCrewAndActorsDetails(String movieId) {
 
-        MovieCastDto movieCastDto = null;
-
-        String url = "https://api.themoviedb.org/3/movie/" + movieId + "/credits?api_key=" + ApiKey;
+        MovieCastDTO movieCastDTO = null;
+        String url = "https://api.themoviedb.org/3/movie/" + movieId + "?append_to_response=credits&language=en-US&api_key=" + ApiKey;
         String json = ApiReader.getDataFromUrl(url);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -69,17 +70,15 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
 
         try {
-            movieCastDto = objectMapper.readValue(json, MovieCastDto.class);
+            movieCastDTO = objectMapper.readValue(json, MovieCastDTO.class);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return movieCastDto;
+        return movieCastDTO;
     }
 
     public static List<Genre> getAllGenres() {
-
         ArrayList<Genre> genres = new ArrayList<>();
 
         String url = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + ApiKey;
@@ -87,9 +86,7 @@ public class TmdbService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
         try {
-
             GenresResponseDto response = objectMapper.readValue(json, GenresResponseDto.class);
             for (GenreDto g : response.genres) {
                 genres.add(new Genre(null, g.tmdbId, g.name));
@@ -104,40 +101,34 @@ public class TmdbService {
         return null;
     }
 
-    public static Actor convertFromActorDtoToActor(ActorDto actorDto) {
+    public static Actor convertFromActorDtoToActor(CastDTO castDTO) {
         return Actor.builder()
-                .name(actorDto.name)
-                .gender(actorDto.gender)
-                .popularity(actorDto.popularity)
+                .name(castDTO.name)
+                .gender(castDTO.gender)
+                .popularity(castDTO.popularity)
                 .build();
     }
 
-    public static List<ActorDto> getActorDto(String movieID) {
-        return getCrewAndActorsDetails(movieID).cast;
-    }
-
-    public static List<Actor> getActors(List<ActorDto> dto) {
+    public static List<Actor> getActors(List<CastDTO> dto) {
         return dto.stream().map(TmdbService::convertFromActorDtoToActor).toList();
     }
 
-    public static List<DirectorDto> getDirectorDto(String movieID) {
-        List<DirectorDto> list = getCrewAndActorsDetails(movieID).crew;
-        return list
-                .stream()
-                .filter(person -> "Director".equals(person.job()))
-                .collect(Collectors.toList());
-    }
-
-    public static Director convertFromDirectorDtoToDirector(DirectorDto directorDto) {
+    public static Director convertFromCastDtoToDirector(CrewDTO directorDto) {
         return Director.builder()
+                .tmdbId(String.valueOf(directorDto.id))
                 .name(directorDto.name)
                 .gender(directorDto.gender)
-                .popularity(directorDto.popularity)
                 .build();
     }
 
-    public static List<Director> getDirectors(List<DirectorDto> dto) {
-        return dto.stream().map(TmdbService::convertFromDirectorDtoToDirector).toList();
+    public static List<Director> getDirectors(MovieCastDTO dto) {
+        List<Director> directors = dto.credits.crew.stream()
+                .filter(person -> {
+                    return "Director".equalsIgnoreCase(person.job);
+                })
+                .map(TmdbService::convertFromCastDtoToDirector)
+                .toList();
+        return directors;
     }
 
     private record GenresResponseDto(List<GenreDto> genres) {
@@ -149,27 +140,33 @@ public class TmdbService {
     }
 
 
-    private record MovieCastDto(
-            Integer id,
-            List<ActorDto> cast,
-            List<DirectorDto> crew) {
-
+    public record MovieCastDTO(int id,
+                               String imdbId,
+                               CreditsDTO credits) {
     }
 
-    public record DirectorDto(
-            String name,
-            Gender gender,
-            String job,
-            double popularity) {
+    public record CreditsDTO(List<CastDTO> cast,
+                             List<CrewDTO> crew) {
     }
 
-    private record ActorDto(
-            @JsonProperty("id")
-            Integer tmdbId,
-            String name,
-            Gender gender,
-            double popularity,
-            String character) {
+    public record CastDTO(boolean adult,
+                          Gender gender,
+                          int id,
+                          String known_for_department,
+                          String name,
+                          String originalName,
+                          double popularity,
+                          String character,
+                          String creditId,
+                          String job) {
+    }
+
+    public record CrewDTO(boolean adult,
+                          Gender gender,
+                          int id,
+                          String known_for_department,
+                          String name,
+                          String job) {
     }
 
     private record MovieResponseDto(MovieResult[] results) {

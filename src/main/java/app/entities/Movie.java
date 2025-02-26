@@ -32,7 +32,13 @@ public class Movie {
     private LocalDate releaseDate;
 
 
+    @Setter
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "movie_director",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "director_id")
+    )
     private List<Director> directors;
 
 

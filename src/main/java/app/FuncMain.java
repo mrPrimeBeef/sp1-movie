@@ -1,6 +1,7 @@
 package app;
 
 import app.config.HibernateConfig;
+import app.daos.DirectorDao;
 import app.daos.GenreDao;
 import app.daos.MovieDao;
 import jakarta.persistence.EntityManagerFactory;
@@ -9,6 +10,7 @@ public class FuncMain {
     public static void main(String[] args) {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         MovieDao movieDao = MovieDao.getInstance(emf);
+        DirectorDao directorDao = DirectorDao.getInstance(emf);
 
 //        movieDao.findAll().forEach(System.out::println);
 
@@ -23,6 +25,8 @@ public class FuncMain {
 //        System.out.println("average rating for lowest rated movies in DB: " + movieDao.averageTop10LowestRating());
 
 //        System.out.println("average rating for higst rated movies in DB: " + movieDao.averageTop10HigestRating());
+
+
 
     }
 }
