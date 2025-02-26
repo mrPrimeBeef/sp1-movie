@@ -44,7 +44,7 @@ public class TmdbService {
                         genres.add(genreMap.get(tmdbId));
                     }
 
-                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, null, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, genres));
+                    movies.add(new Movie(null, r.tmdbId, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, genres));
                 }
 
                 if (response.results.length < 20) {

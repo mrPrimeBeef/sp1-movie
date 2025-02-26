@@ -22,7 +22,10 @@ public class Movie {
     private Integer tmdbId;
     private String title;
     private String originalTitle;
+
+    @Column(length = 1000)
     private String overview;
+
     private boolean adult;
     private String originalLanguage;
     private double popularity;
