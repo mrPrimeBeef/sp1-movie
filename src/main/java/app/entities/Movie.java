@@ -8,6 +8,7 @@ import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
 
+@EqualsAndHashCode(of = "id")
 @Builder
 @ToString
 @Getter
@@ -29,15 +30,14 @@ public class Movie {
     private double popularity;
     private LocalDate releaseDate;
 
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Director> directors;
-
+    @Setter
+    @ManyToMany
+    private Set<Director> directors;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
     private Set<JoinMovieActor> joins = new HashSet<>();
 
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     private List<Genre> genres;
 }

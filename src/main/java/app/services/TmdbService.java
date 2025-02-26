@@ -1,11 +1,11 @@
 package app.services;
 
+import java.sql.SQLOutput;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import app.config.HibernateConfig;
+import app.daos.DirectorDao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,22 +14,31 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import app.entities.*;
 import app.utils.ApiReader;
 import app.utils.Utils;
+import jakarta.persistence.EntityManagerFactory;
 
 
 public class TmdbService {
 
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
-    public static List<Movie> getDanishMoviesSince2020(Map<Integer, Genre> genreMap) {
+    private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+    private static final DirectorDao directorDao = DirectorDao.getInstance(emf);
 
-        ArrayList<Movie> movies = new ArrayList<>(1300);
+    public static void shutdown() {
+        emf.close();
+    }
+
+    public static Set<Movie> getDanishMoviesSince2020(Map<Integer, Genre> genreMap) {
+
+        // TODO: Necessary with initial capacity for hashset?
+        HashSet<Movie> movies = new HashSet<>();
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // TODO: HUsk at slette page<2
-            for (int page = 1; page < 2; page++) {
+            for (int page = 1; ; page++) {
 
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
@@ -57,24 +66,38 @@ public class TmdbService {
         return null;
     }
 
-    private static CreditsResponseDto getCreditsForMovie(Integer tmdbMovieId) {
+    public static void addCreditsToMovie(Movie movie) {
 
-        CreditsResponseDto creditsResponseDto = null;
-
-        String url = "https://api.themoviedb.org/3/movie/" + tmdbMovieId.toString() + "/credits?api_key=" + ApiKey;
+        String url = "https://api.themoviedb.org/3/movie/" + movie.getId() + "/credits?api_key=" + ApiKey;
         String json = ApiReader.getDataFromUrl(url);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            creditsResponseDto = objectMapper.readValue(json, CreditsResponseDto.class);
+            CreditsResponseDto response = objectMapper.readValue(json, CreditsResponseDto.class);
+
+            HashSet<Director> directors = new HashSet<>();
+
+            for (DirectorDto d : response.crew) {
+                if (d.job.equals("Director")) {
+
+                    Director director = directorDao.findById(d.id);
+                    if (director == null) {
+                        director = directorDao.create(new Director(d.id, d.name, d.gender, d.popularity));
+                    }
+
+                    directors.add(director);
+
+                }
+            }
+
+            movie.setDirectors(directors);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return creditsResponseDto;
     }
 
     public static List<Genre> getAllGenres() {
@@ -83,6 +106,7 @@ public class TmdbService {
 
         String url = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + ApiKey;
         String json = ApiReader.getDataFromUrl(url);
+        System.out.println(json);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -104,32 +128,32 @@ public class TmdbService {
     }
 
 
-    public static List<Actor> getActorsForMovie(int tmdbMovieId) {
+//    public static List<Actor> getActorsForMovie(int tmdbMovieId) {
+//
+//        CreditsResponseDto creditsResponseDto = getCreditsForMovie(tmdbMovieId);
+//
+//        List<Actor> actors = new LinkedList<>();
+//        for (ActorDto a : creditsResponseDto.cast) {
+//            actors.add(new Actor(a.id, a.name, a.gender, a.popularity, null));
+//        }
+//
+//        return actors;
+//    }
 
-        CreditsResponseDto creditsResponseDto = getCreditsForMovie(tmdbMovieId);
-
-        List<Actor> actors = new LinkedList<>();
-        for (ActorDto a : creditsResponseDto.cast) {
-            actors.add(new Actor(a.id, a.name, a.gender, a.popularity, null));
-        }
-
-        return actors;
-    }
-
-    public static List<Director> getDirectorsForMovie(int tmdbMovieId) {
-
-        CreditsResponseDto creditsResponseDto = getCreditsForMovie(tmdbMovieId);
-
-        List<Director> directors = new LinkedList<>();
-        for (DirectorDto d : creditsResponseDto.crew) {
-            if (d.job.equals("Director")) {
-                directors.add(new Director(d.tmdbId, d.name, d.gender, d.popularity, null));
-            }
-
-        }
-
-        return directors;
-    }
+//    public static List<Director> getDirectorsForMovie(int tmdbMovieId) {
+//
+//        CreditsResponseDto creditsResponseDto = getCreditsForMovie(tmdbMovieId);
+//
+//        List<Director> directors = new LinkedList<>();
+//        for (DirectorDto d : creditsResponseDto.crew) {
+//            if (d.job.equals("Director")) {
+//                directors.add(new Director(d.tmdbId, d.name, d.gender, d.popularity, null));
+//            }
+//
+//        }
+//
+//        return directors;
+//    }
 
     private record CreditsResponseDto(
             List<ActorDto> cast,
@@ -145,8 +169,7 @@ public class TmdbService {
     }
 
     public record DirectorDto(
-            @JsonProperty("id")
-            Integer tmdbId,
+            Integer id,
             String name,
             Gender gender,
             String job,

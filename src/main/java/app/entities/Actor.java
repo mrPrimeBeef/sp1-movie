@@ -6,7 +6,7 @@ import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
 
-@EqualsAndHashCode
+//@EqualsAndHashCode
 @ToString
 @Getter
 @Builder

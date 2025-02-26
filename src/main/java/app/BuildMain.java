@@ -1,9 +1,6 @@
 package app;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import jakarta.persistence.EntityManagerFactory;
 
@@ -34,32 +31,43 @@ public class BuildMain {
         genres.forEach(g -> genreMap.put(g.getId(), g));
 
         // Get all movies from TMDB - we need genreMap to put genre entity inside movie entity
-        List<Movie> movies = TmdbService.getDanishMoviesSince2020(genreMap);
+        Set<Movie> movies = TmdbService.getDanishMoviesSince2020(genreMap);
+//        movies.forEach(System.out::println);
+        movies.forEach(TmdbService::addCreditsToMovie);
+
+//        for(Movie m:movies){
+//            TmdbService.addCreditsToMovie(m);
+//        }
+
+        movies.forEach(System.out::println);
         movies.forEach(movieDao::create);
 
-        // TODO: Gør sådan at tmdbId for actors ikke er null
-        HashSet<Actor> allActorsInAllMovies = new HashSet<>();
-        HashSet<Director> allDirectorsInAllMovies = new HashSet<>();
+        // Add directors to all movies
 
-        for (Movie movie : movies) {
-
-            List<Actor> actorsInThisMovie = TmdbService.getActorsForMovie(movie.getId());
-            for (Actor actor : actorsInThisMovie) {
-                allActorsInAllMovies.add(actor);
-            }
-
-            List<Director> directorsInThisMovie = TmdbService.getDirectorsForMovie(movie.getId());
-            for (Director director : directorsInThisMovie) {
-                allDirectorsInAllMovies.add(director);
-            }
-
-        }
-
-        allActorsInAllMovies.forEach(System.out::println);
-        allDirectorsInAllMovies.forEach(System.out::println);
+//        // TODO: Gør sådan at tmdbId for actors ikke er null
+//        HashSet<Actor> allActorsInAllMovies = new HashSet<>();
+//        HashSet<Director> allDirectorsInAllMovies = new HashSet<>();
+//
+//        for (Movie movie : movies) {
+//
+//            List<Actor> actorsInThisMovie = TmdbService.getActorsForMovie(movie.getId());
+//            for (Actor actor : actorsInThisMovie) {
+//                allActorsInAllMovies.add(actor);
+//            }
+//
+//            List<Director> directorsInThisMovie = TmdbService.getDirectorsForMovie(movie.getId());
+//            for (Director director : directorsInThisMovie) {
+//                allDirectorsInAllMovies.add(director);
+//            }
+//
+//        }
+//
+//        allActorsInAllMovies.forEach(System.out::println);
+//        allDirectorsInAllMovies.forEach(System.out::println);
 
 
         emf.close();
+        TmdbService.shutdown();
 
     }
 }
