@@ -26,6 +26,7 @@ public class FuncMain {
 
 //        System.out.println("average rating for higst rated movies in DB: " + movieDao.averageTop10HigestRating());
 
+//        System.out.println(directorDao.findDirectorsByMovie(2));
 
 
     }

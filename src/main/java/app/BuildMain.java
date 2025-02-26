@@ -1,9 +1,6 @@
 package app;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,24 +42,22 @@ public class BuildMain {
         movies.forEach(movieDao::create);
 
         // Get all Directors and add them to DB
-         addDirectors(movies, directorDao);
-
-        System.out.println(directorDao.findDirectorsByMovie(1));
+        addDirectors(movies, directorDao, movieDao);
 
         emf.close();
     }
 
-    private static void addDirectors(List<Movie> movies, DirectorDao directorDao) {
+    private static void addDirectors(List<Movie> movies, DirectorDao directorDao, MovieDao movieDao) {
         HashSet<Director> allDirectorsInAllMovies = new HashSet<>();
-        ExecutorService executor = Executors.newCachedThreadPool();
 
+        ExecutorService executor = Executors.newCachedThreadPool();
         Map<Movie, Future<List<Director>>> futureMap = new HashMap<>();
 
         // Start async tasks for hver film
         for (Movie movie : movies) {
-            Future<List<Director>> future = executor.submit(() -> {
-                return TmdbService.getDirectors(TmdbService.getCrewAndActorsDetails(movie.getTmdbId().toString()));
-            });
+            Future<List<Director>> future = executor.submit(() ->
+                    TmdbService.getDirectors(TmdbService.getCrewAndActorsDetails(movie.getTmdbId().toString()))
+            );
             futureMap.put(movie, future);
         }
 
@@ -72,13 +67,23 @@ public class BuildMain {
             Future<List<Director>> future = entry.getValue();
             try {
                 List<Director> directorsInThisMovie = future.get();
-                movie.setDirectors(directorsInThisMovie);
-                allDirectorsInAllMovies.addAll(directorsInThisMovie);
+                List<Director> managedDirectors = new ArrayList<>();
+                for (Director director : directorsInThisMovie) {
+                    Director managedDirector = directorDao.findById(Integer.parseInt(director.getTmdbId()));
+                    if (managedDirector == null) {
+                        managedDirector = directorDao.create(director);
+                    }
+                    managedDirectors.add(managedDirector);
+                }
+
+                movie.setDirectors(managedDirectors);
+                movieDao.update(movie);
+
+                allDirectorsInAllMovies.addAll(managedDirectors);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
         executor.shutdown();
-        allDirectorsInAllMovies.forEach(directorDao::create);
     }
 }
