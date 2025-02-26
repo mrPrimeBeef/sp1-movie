@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import app.entities.Director;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.config.HibernateConfig;
@@ -38,17 +39,27 @@ public class BuildMain {
 
         // TODO: Gør sådan at tmdbId for actors ikke er null
         HashSet<Actor> allActorsInAllMovies = new HashSet<>();
+        HashSet<Director> allDirectorsInAllMovies = new HashSet<>();
 
         for (Movie movie : movies) {
 
-            List<Actor> actorsInThisMovie = TmdbService.getActors(TmdbService.getActorDto(movie.getTmdbId().toString()));
-
+            List<Actor> actorsInThisMovie = TmdbService.getActorsForMovie(movie.getTmdbId());
             for (Actor actor : actorsInThisMovie) {
                 allActorsInAllMovies.add(actor);
             }
 
+            List<Director> directorsInThisMovie = TmdbService.getDirectorsForMovie(movie.getTmdbId());
+            for (Director director : directorsInThisMovie) {
+                allDirectorsInAllMovies.add(director);
+            }
+
         }
+
         allActorsInAllMovies.forEach(System.out::println);
+        allDirectorsInAllMovies.forEach(System.out::println);
+
+
         emf.close();
+
     }
 }

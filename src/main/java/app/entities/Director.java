@@ -1,12 +1,12 @@
 package app.entities;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@EqualsAndHashCode
+@ToString
 @Getter
 @Builder
 @NoArgsConstructor
@@ -16,6 +16,8 @@ public class Director {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    private Integer tmdbId;
 
     private String name;
 
