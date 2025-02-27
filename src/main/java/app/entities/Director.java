@@ -29,4 +29,5 @@ public class Director {
     @ToString.Exclude
     @ManyToMany(mappedBy = "directors", fetch = FetchType.EAGER)
     private List<Movie> movies;
+
 }

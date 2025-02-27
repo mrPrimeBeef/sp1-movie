@@ -6,7 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import app.dtos.DirectorDTO;
+import app.dtos.GenreDTO;
+import app.dtos.MovieActorDTO;
+import app.dtos.MovieDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -195,6 +200,59 @@ public class TmdbService {
                                @JsonProperty("genre_ids")
                                List<Integer> genreIds
     ) {
+    }
+
+    public static String convertMovieListToJson(List<Movie> movies) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        List<MovieDTO> dtos = movies.stream()
+                .map(TmdbService::convertMovieToDTO)
+                .collect(Collectors.toList());
+        String json = objectMapper.writeValueAsString(dtos);
+
+        return json;
+    }
+
+    private static MovieDTO convertMovieToDTO(Movie movie) {
+        List<DirectorDTO> directorDTOs = movie.getDirectors().stream()
+                .map(director -> new DirectorDTO(
+                        director.getName(),
+                        director.getGender(),
+                        director.getPopularity(),
+                        director.getTmdbId()))
+                .collect(Collectors.toList());
+
+        List<GenreDTO> genreDTOs = movie.getGenres().stream()
+                .map(genre -> new GenreDTO(
+                        genre.getTmdbId(),
+                        genre.getName()))
+                .collect(Collectors.toList());
+
+        List<MovieActorDTO> actorDTOs = movie.getJoins().stream()
+                .map(join -> new MovieActorDTO(
+                        join.getActor().getName(),
+                        join.getActor().getGender(),
+                        join.getActor().getPopularity(),
+                        join.getActor().getTmdbId(),
+                        join.getCharacter()))
+                .collect(Collectors.toList());
+
+        return new MovieDTO(
+                movie.getId(),
+                movie.getTmdbId(),
+                movie.getTitle(),
+                movie.getOriginalTitle(),
+                movie.getOverview(),
+                movie.isAdult(),
+                movie.getOriginalLanguage(),
+                movie.getPopularity(),
+                movie.getReleaseDate(),
+                directorDTOs,
+                genreDTOs,
+                actorDTOs
+        );
     }
 
 }

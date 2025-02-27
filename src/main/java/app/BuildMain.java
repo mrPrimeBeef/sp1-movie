@@ -1,5 +1,8 @@
 package app;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -9,6 +12,7 @@ import java.util.concurrent.Future;
 import app.daos.DirectorDao;
 import app.entities.*;
 import app.threads.CallableThread;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.config.HibernateConfig;
@@ -16,9 +20,10 @@ import app.services.TmdbService;
 import app.daos.GenreDao;
 import app.daos.ActorDao;
 import app.daos.MovieDao;
+import jakarta.persistence.Tuple;
 
 public class BuildMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JsonProcessingException {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         GenreDao genreDao = GenreDao.getInstance(emf);
@@ -43,6 +48,8 @@ public class BuildMain {
 
         // Get Actors and add to DB and movies
         addActors(movies, actorDao,movieDao);
+
+        saveTestDataAsJson(movies);
 
         emf.close();
     }
@@ -71,7 +78,7 @@ public class BuildMain {
 
                 for (ActorWithRole actorWithRole : actorsInThisMovie) {
                     Actor actor = actorWithRole.getActor();
-                    String character = actorWithRole.getCharacter(); // Henter den rigtige karakter
+                    String character = actorWithRole.getCharacter();
 
                     Actor managedActor = actorDao.findByTmdbId(actor.getTmdbId());
                     if (managedActor == null) {
@@ -141,5 +148,19 @@ public class BuildMain {
         }
         executor.shutdown();
         return allDirectorsInAllMovies;
+    }
+
+    public static void saveTestDataAsJson(List<Movie> movies) {
+        try {
+            String json = TmdbService.convertMovieListToJson(movies);
+
+            // Gem JSON-strengen i en fil
+            Path path = Paths.get("src/main/resources/testdata.json");
+            Files.writeString(path, json);
+
+            System.out.println("Testdata gemt som JSON");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

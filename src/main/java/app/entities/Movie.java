@@ -45,7 +45,7 @@ public class Movie {
     @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<JoinMovieActor> joins = new HashSet<>();
 
-
+    @Setter
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Genre> genres;
 }

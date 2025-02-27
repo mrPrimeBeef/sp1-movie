@@ -9,6 +9,7 @@ import lombok.*;
 @ToString
 @Getter
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 @Entity
 public class Genre {
