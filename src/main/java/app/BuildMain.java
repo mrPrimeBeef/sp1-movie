@@ -49,7 +49,7 @@ public class BuildMain {
         // Get Actors and add to DB and movies
         addActors(movies, actorDao,movieDao);
 
-        saveTestDataAsJson(movies);
+        // saveTestDataAsJson(movies);
 
         emf.close();
     }

@@ -24,8 +24,6 @@ import lombok.Getter;
 
 
 public class TmdbService {
-//    private static List<ActorDto> actorDtos;
-//    private static List<DirectorDto> directorDtos;
 
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
@@ -254,5 +252,4 @@ public class TmdbService {
                 actorDTOs
         );
     }
-
 }
