@@ -1,6 +1,7 @@
 package app;
 
 import app.config.HibernateConfig;
+import app.daos.ActorDao;
 import app.daos.DirectorDao;
 import app.daos.GenreDao;
 import app.daos.MovieDao;
@@ -11,6 +12,7 @@ public class FuncMain {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         MovieDao movieDao = MovieDao.getInstance(emf);
         DirectorDao directorDao = DirectorDao.getInstance(emf);
+        ActorDao actorDao = ActorDao.getInstance(emf);
 
 //        movieDao.findAll().forEach(System.out::println);
 
@@ -28,6 +30,6 @@ public class FuncMain {
 
 //        System.out.println(directorDao.findDirectorsByMovie(2));
 
-
+//        System.out.println(actorDao.findActorsByMovie(2));
     }
 }

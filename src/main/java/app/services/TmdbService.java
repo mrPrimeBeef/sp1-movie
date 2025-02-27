@@ -14,6 +14,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import app.entities.*;
 import app.utils.ApiReader;
 import app.utils.Utils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 
 public class TmdbService {
@@ -101,16 +103,22 @@ public class TmdbService {
         return null;
     }
 
-    public static Actor convertFromActorDtoToActor(CastDTO castDTO) {
+    public static Actor convertFromActorDtoToActor(CastDTO actorDTO) {
         return Actor.builder()
-                .name(castDTO.name)
-                .gender(castDTO.gender)
-                .popularity(castDTO.popularity)
+                .name(actorDTO.name)
+                .gender(actorDTO.gender)
+                .popularity(actorDTO.popularity)
+                .tmdbId(actorDTO.id)
                 .build();
     }
 
-    public static List<Actor> getActors(List<CastDTO> dto) {
-        return dto.stream().map(TmdbService::convertFromActorDtoToActor).toList();
+    public static List<ActorWithRole> getActors(MovieCastDTO dto) {
+        return dto.credits.cast.stream()
+                .map(actorDTO -> new ActorWithRole(
+                        convertFromActorDtoToActor(actorDTO),
+                        actorDTO.character
+                ))
+                .toList();
     }
 
     public static Director convertFromCastDtoToDirector(CrewDTO directorDto) {
@@ -188,4 +196,5 @@ public class TmdbService {
                                List<Integer> genreIds
     ) {
     }
+
 }

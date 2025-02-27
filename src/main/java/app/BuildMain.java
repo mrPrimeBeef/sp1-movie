@@ -7,18 +7,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import app.daos.DirectorDao;
-import app.entities.Director;
+import app.entities.*;
 import app.threads.CallableThread;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.config.HibernateConfig;
-import app.entities.Movie;
 import app.services.TmdbService;
 import app.daos.GenreDao;
-import app.entities.Genre;
 import app.daos.ActorDao;
 import app.daos.MovieDao;
-import app.entities.Actor;
 
 public class BuildMain {
     public static void main(String[] args) {
@@ -41,13 +38,71 @@ public class BuildMain {
         List<Movie> movies = TmdbService.getDanishMoviesSince2020(genreMap);
         movies.forEach(movieDao::create);
 
-        // Get all Directors and add them to DB
+        // Get Directors and add to DB and movies
         addDirectors(movies, directorDao, movieDao);
+
+        // Get Actors and add to DB and movies
+        addActors(movies, actorDao,movieDao);
 
         emf.close();
     }
 
-    private static void addDirectors(List<Movie> movies, DirectorDao directorDao, MovieDao movieDao) {
+    private static void addActors(List<Movie> movies, ActorDao actorDao, MovieDao movieDao) {
+        HashSet<Actor> allActorsInAllMovies = new HashSet<>();
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Map<Movie, Future<List<ActorWithRole>>> futureMap = new HashMap<>();
+
+        // Start async tasks for hver film
+        for (Movie movie : movies) {
+            Future<List<ActorWithRole>> future = executor.submit(() ->
+                    TmdbService.getActors(TmdbService.getCrewAndActorsDetails(movie.getTmdbId().toString()))
+            );
+            futureMap.put(movie, future);
+        }
+
+        // Hent resultaterne og tilføj skuespillerne til de rigtige film
+        for (Map.Entry<Movie, Future<List<ActorWithRole>>> entry : futureMap.entrySet()) {
+            Movie movie = entry.getKey();
+            Future<List<ActorWithRole>> future = entry.getValue();
+
+            try {
+                List<ActorWithRole> actorsInThisMovie = future.get();
+                Set<JoinMovieActor> joins = new HashSet<>();
+
+                for (ActorWithRole actorWithRole : actorsInThisMovie) {
+                    Actor actor = actorWithRole.getActor();
+                    String character = actorWithRole.getCharacter(); // Henter den rigtige karakter
+
+                    Actor managedActor = actorDao.findByTmdbId(actor.getTmdbId());
+                    if (managedActor == null) {
+                        managedActor = actorDao.create(actor);
+                    }
+
+                    JoinMovieActor join = JoinMovieActor.builder()
+                            .movie(movie)
+                            .actor(managedActor)
+                            .character(character != null ? character : "Unknown")
+                            .build();
+
+                    joins.add(join);
+                    allActorsInAllMovies.add(managedActor);
+                }
+
+                if (movie.getJoins() == null) {
+                    movie.setJoins(new HashSet<>());
+                }
+                movie.getJoins().addAll(joins);
+
+                movieDao.update(movie);
+
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        executor.shutdown();
+    }
+
+    private static HashSet<Director> addDirectors(List<Movie> movies, DirectorDao directorDao, MovieDao movieDao) {
         HashSet<Director> allDirectorsInAllMovies = new HashSet<>();
 
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -85,5 +140,6 @@ public class BuildMain {
             }
         }
         executor.shutdown();
+        return allDirectorsInAllMovies;
     }
 }

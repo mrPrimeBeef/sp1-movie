@@ -27,6 +27,6 @@ public class Actor {
 
     private double popularity;
 
-    @OneToMany(mappedBy = "actor")
+    @OneToMany(mappedBy = "actor", fetch = FetchType.EAGER)
     private Set<JoinMovieActor> joins = new HashSet<>();
 }
