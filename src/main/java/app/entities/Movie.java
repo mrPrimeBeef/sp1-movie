@@ -33,9 +33,9 @@ public class Movie {
     @ManyToMany
     private Set<Director> directors;
 
-    @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
-    private Set<JoinMovieActor> joins = new HashSet<>();
-
+    @Setter
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST)
+    private Set<MovieActor> actors = new HashSet<>();
 
     @ManyToMany
     private List<Genre> genres;

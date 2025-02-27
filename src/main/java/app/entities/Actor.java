@@ -24,5 +24,5 @@ public class Actor {
     private double popularity;
 
     @OneToMany(mappedBy = "actor")
-    private Set<JoinMovieActor> joins = new HashSet<>();
+    private Set<MovieActor> movies = new HashSet<>();
 }
