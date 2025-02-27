@@ -41,11 +41,10 @@ public class HibernateConfig {
 
     // TODO: IMPORTANT: Add Entity classes here for them to be registered with Hibernate
     private static void getAnnotationConfiguration(Configuration configuration) {
-        configuration.addAnnotatedClass(Actor.class);
-        configuration.addAnnotatedClass(Director.class);
+        configuration.addAnnotatedClass(Person.class);
         configuration.addAnnotatedClass(Movie.class);
         configuration.addAnnotatedClass(Genre.class);
-        configuration.addAnnotatedClass(ActingCredit.class);
+        configuration.addAnnotatedClass(Credit.class);
 
     }
 

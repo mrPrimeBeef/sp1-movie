@@ -29,14 +29,11 @@ public class Movie {
     private double popularity;
     private LocalDate releaseDate;
 
-    @Setter
     @ManyToMany
-    private Set<Director> directors;
+    private List<Genre> genres;
 
     @Setter
     @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST)
-    private Set<ActingCredit> actingCredits = new HashSet<>();
+    private Set<Credit> credits = new HashSet<>();
 
-    @ManyToMany
-    private List<Genre> genres;
 }

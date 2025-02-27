@@ -1,15 +1,18 @@
 package app.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.*;
 import lombok.*;
 
-@EqualsAndHashCode(of = "id")
+//@EqualsAndHashCode
 @ToString
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Director {
+public class Person {
     @Id
     private Integer id;
 
@@ -20,4 +23,6 @@ public class Director {
 
     private double popularity;
 
+    @OneToMany(mappedBy = "person")
+    private Set<Credit> credits = new HashSet<>();
 }

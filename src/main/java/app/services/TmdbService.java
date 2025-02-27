@@ -13,8 +13,7 @@ import app.entities.*;
 import app.utils.ApiReader;
 import app.utils.Utils;
 import app.config.HibernateConfig;
-import app.daos.DirectorDao;
-import app.daos.ActorDao;
+import app.daos.PersonDao;
 
 
 public class TmdbService {
@@ -22,8 +21,7 @@ public class TmdbService {
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
     private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
-    private static final ActorDao actorDao = ActorDao.getInstance(emf);
-    private static final DirectorDao directorDao = DirectorDao.getInstance(emf);
+    private static final PersonDao personDao = PersonDao.getInstance(emf);
 
     public static void shutdown() {
         emf.close();
@@ -39,7 +37,7 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // TODO: HUsk at slette page<2
-            for (int page = 1; page<2; page++) {
+            for (int page = 1; page < 2; page++) {
 
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
@@ -53,7 +51,7 @@ public class TmdbService {
                         genres.add(genreMap.get(tmdbId));
                     }
 
-                    movies.add(new Movie(r.id, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, null, null, genres));
+                    movies.add(new Movie(r.id, r.title, r.originalTitle, r.overview, r.adult, r.originalLanguage, r.popularity, r.releaseDate, genres, null));
                 }
 
                 if (response.results.length < 20) {
@@ -78,39 +76,33 @@ public class TmdbService {
         try {
             CreditsResponseDto response = objectMapper.readValue(json, CreditsResponseDto.class);
 
-
-            HashSet<Director> directors = new HashSet<>();
-
-            for (DirectorDto d : response.crew) {
-                if (d.job.equals("Director")) {
-
-                    Director director = directorDao.findById(d.id);
-                    if (director == null) {
-                        director = directorDao.create(new Director(d.id, d.name, d.gender, d.popularity));
-                    }
-
-                    directors.add(director);
-                }
-            }
-
-            movie.setDirectors(directors);
-
-
-            HashSet<ActingCredit> actors = new HashSet<>();
+            HashSet<Credit> credits = new HashSet<>();
 
             for (ActorDto a : response.cast) {
 
-                Actor actor = actorDao.findById(a.id);
-                if (actor == null) {
-                    actor = actorDao.create(new Actor(a.id, a.name, a.gender, a.popularity, null));
+                Person person = personDao.findById(a.id);
+                if (person == null) {
+                    person = personDao.create(new Person(a.id, a.name, a.gender, a.popularity, null));
                 }
 
-                actors.add(new ActingCredit(null, movie, actor, a.character));
+                credits.add(new Credit(null, movie, person, "Actor", a.character));
+            }
+
+
+            for (DirectorDto d : response.crew) {
+
+                Person person = personDao.findById(d.id);
+                if (person == null) {
+                    person = personDao.create(new Person(d.id, d.name, d.gender, d.popularity, null));
+                }
+
+                credits.add(new Credit(null, movie, person, d.job, null));
+
             }
 
 
             // TODO: Fix this so it works
-            movie.setActingCredits(actors);
+            movie.setCredits(credits);
 
         } catch (Exception e) {
             e.printStackTrace();

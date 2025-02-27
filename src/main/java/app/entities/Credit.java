@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class ActingCredit {
+public class Credit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -18,7 +18,9 @@ public class ActingCredit {
     private Movie movie;
 
     @ManyToOne
-    private Actor actor;
+    private Person person;
+
+    private String job;
 
     private String character;
 }
