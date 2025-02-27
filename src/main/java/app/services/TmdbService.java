@@ -39,7 +39,7 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // TODO: HUsk at slette page<2
-            for (int page = 1; ; page++) {
+            for (int page = 1; page<2; page++) {
 
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
@@ -96,7 +96,7 @@ public class TmdbService {
             movie.setDirectors(directors);
 
 
-            HashSet<MovieActor> actors = new HashSet<>();
+            HashSet<ActingCredit> actors = new HashSet<>();
 
             for (ActorDto a : response.cast) {
 
@@ -105,12 +105,12 @@ public class TmdbService {
                     actor = actorDao.create(new Actor(a.id, a.name, a.gender, a.popularity, null));
                 }
 
-                actors.add(new MovieActor(null, movie, actor, a.character));
+                actors.add(new ActingCredit(null, movie, actor, a.character));
             }
 
 
             // TODO: Fix this so it works
-            movie.setActors(actors);
+            movie.setActingCredits(actors);
 
         } catch (Exception e) {
             e.printStackTrace();

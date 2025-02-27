@@ -9,17 +9,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class MovieActor {
+public class ActingCredit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    //    @JoinColumn(name = "movie_id", nullable = false)
     @ManyToOne
     private Movie movie;
 
-
-    //    @JoinColumn(name = "actor_id", nullable = false)
     @ManyToOne
     private Actor actor;
 

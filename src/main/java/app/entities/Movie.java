@@ -35,7 +35,7 @@ public class Movie {
 
     @Setter
     @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST)
-    private Set<MovieActor> actors = new HashSet<>();
+    private Set<ActingCredit> actingCredits = new HashSet<>();
 
     @ManyToMany
     private List<Genre> genres;
