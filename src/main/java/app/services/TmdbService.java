@@ -37,7 +37,7 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
         try {
             // TODO: HUsk at slette page<2
-            for (int page = 1; page < 2; page++) {
+            for (int page = 1; ; page++) {
 
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 String json = ApiReader.getDataFromUrl(url);
@@ -78,7 +78,7 @@ public class TmdbService {
 
             HashSet<Credit> credits = new HashSet<>();
 
-            for (ActorDto a : response.cast) {
+            for (Member a : response.cast) {
 
                 Person person = personDao.findById(a.id);
                 if (person == null) {
@@ -89,7 +89,7 @@ public class TmdbService {
             }
 
 
-            for (DirectorDto d : response.crew) {
+            for (Member d : response.crew) {
 
                 Person person = personDao.findById(d.id);
                 if (person == null) {
@@ -100,8 +100,6 @@ public class TmdbService {
 
             }
 
-
-            // TODO: Fix this so it works
             movie.setCredits(credits);
 
         } catch (Exception e) {
@@ -139,25 +137,34 @@ public class TmdbService {
 
 
     private record CreditsResponseDto(
-            List<ActorDto> cast,
-            List<DirectorDto> crew) {
+            Member[] cast,
+            Member[] crew) {
     }
 
-    private record ActorDto(
+    private record Member(
             Integer id,
             String name,
             Gender gender,
-            double popularity,
+            Double popularity,
+            String job,
             String character) {
     }
 
-    public record DirectorDto(
-            Integer id,
-            String name,
-            Gender gender,
-            String job,
-            double popularity) {
-    }
+//    private record CastMember(
+//            Integer id,
+//            String name,
+//            Gender gender,
+//            Double popularity,
+//            String character) {
+//    }
+//
+//    private record CrewMember(
+//            Integer id,
+//            String name,
+//            Gender gender,
+//            Double popularity,
+//            String job) {
+//    }
 
 
     private record MovieResponseDto(MovieResult[] results) {
