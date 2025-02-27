@@ -9,7 +9,6 @@ import lombok.*;
 //@EqualsAndHashCode
 @ToString
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

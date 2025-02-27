@@ -10,7 +10,7 @@ public class FuncMain {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         MovieDao movieDao = MovieDao.getInstance(emf);
 
-//        movieDao.findAll().forEach(System.out::println);
+        movieDao.findAll().forEach(System.out::println);
 
 //        System.out.println( "Wild Men genres: " + movieDao.FindAllGenreByMovieTitle("Wild Men"));
 //
@@ -23,6 +23,9 @@ public class FuncMain {
 //        System.out.println("average rating for lowest rated movies in DB: " + movieDao.averageTop10LowestRating());
 
 //        System.out.println("average rating for higst rated movies in DB: " + movieDao.averageTop10HigestRating());
+
+
+        emf.close();
 
     }
 }

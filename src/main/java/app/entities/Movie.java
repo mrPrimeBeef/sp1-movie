@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @EqualsAndHashCode(of = "id")
-@Builder
 @ToString
 @Getter
 @NoArgsConstructor
