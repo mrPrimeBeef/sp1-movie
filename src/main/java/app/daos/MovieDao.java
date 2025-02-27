@@ -42,12 +42,12 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
         }
     }
 
-    public List<Movie> searchMovieByString(String title) {
+    public Movie searchMovieByString(String title) {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "SELECT m FROM Movie m WHERE LOWER(m.title) = LOWER(:title)";
-            TypedQuery query = em.createQuery(jpql, Movie.class);
+            TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
             query.setParameter("title", title);
-            return query.getResultList();
+            return query.getSingleResult();
         }
     }
 

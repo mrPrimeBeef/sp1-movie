@@ -48,6 +48,9 @@ class MovieDaoTest extends TestSetUp {
 
     @Test
     void searchMovieByString() {
+        Movie movie = movieDao.searchMovieByString("river of blood");
+
+        assertEquals("River of Blood",movie.getTitle());
     }
 
     @Test
