@@ -21,8 +21,8 @@ public class PersonDao extends AbstractDao<Person, Integer> {
     }
 
 
-    public Person create(MemberDto p) {
-        return create(new Person(p.id(), p.name(), p.gender(), p.popularity(), null));
+    public Person update(MemberDto p) {
+        return update(new Person(p.id(), p.name(), p.gender(), p.popularity(), null));
     }
 
 }

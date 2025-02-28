@@ -29,12 +29,17 @@ public class BuildMain {
         Set<MovieDto> movies = TmdbService.getDanishMoviesSince2020();
         movies.forEach(System.out::println);
 
-        Set<MemberDto> persons = TmdbService.getMembersForMovieId(1029880);
-//        persons.forEach(personDao::create);
+        for(MovieDto movie:movies){
 
+            Set<MemberDto> members = TmdbService.getMembersForMovieId(movie.id());
+
+            for(MemberDto member:members){
+                personDao.update(member);
+            }
+
+        }
 
         emf.close();
-
 
     }
 
