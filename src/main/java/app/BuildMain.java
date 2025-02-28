@@ -27,10 +27,13 @@ public class BuildMain {
     private static final MovieDao movieDao = MovieDao.getInstance(emf);
     private static final PersonDao personDao = PersonDao.getInstance(emf);
 
+    private static final int MAX_TASKS_PER_SECOND = 30; // Documentation says around 40 per second
+    private static final long DELAY_MILLISECONDS = 1000 / MAX_TASKS_PER_SECOND;
+
     public static void main(String[] args) {
 
-        ExecutorService executor = Executors.newCachedThreadPool();
-//        ExecutorService executor = Executors.newFixedThreadPool(2);
+//        ExecutorService executor = Executors.newCachedThreadPool();
+        ExecutorService executor = Executors.newFixedThreadPool(3);
 
 //        ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
 
@@ -54,12 +57,24 @@ public class BuildMain {
             movies.add(movieDao.create(movie));
         }
 
+        long timeA = System.currentTimeMillis();
 
         // Start concurrent runnable tasks
         List<Future> futures = new LinkedList<>();
         for (Movie movie : movies) {
+
+            long startTime = System.currentTimeMillis();
+
             Runnable task = new TaskGetCreditsForMovie(movie);
             futures.add(executor.submit(task));
+
+            long sleepTime = Math.max(DELAY_MILLISECONDS - (System.currentTimeMillis() - startTime), 0);
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
 
         // Wait for tasks to finish
@@ -71,6 +86,9 @@ public class BuildMain {
             }
         }
 
+        long timeB = System.currentTimeMillis();
+        System.out.println(timeB - timeA);
+
         emf.close();
         executor.shutdown();
 
@@ -78,9 +96,6 @@ public class BuildMain {
 
 
     private static class TaskGetCreditsForMovie implements Runnable {
-
-        private static final int MAX_TASKS_PER_SECOND = 30; // Documentation says around 40 per second
-        private static final long DELAY_MILLISECONDS = 1000 / MAX_TASKS_PER_SECOND;
 
         private Movie movie;
 
@@ -90,8 +105,6 @@ public class BuildMain {
 
         @Override
         public void run() {
-
-            long startTime = System.currentTimeMillis();
 
             // Remember a person can be member twice in this movie
             // Loop though members of this movie, create them as a person if they are not already created
@@ -108,13 +121,6 @@ public class BuildMain {
             movieDao.update(movie);
 
             System.out.println(movie);
-
-            try {
-                long sleepTime = Math.max(DELAY_MILLISECONDS - (System.currentTimeMillis() - startTime), 0);
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
         }
 
