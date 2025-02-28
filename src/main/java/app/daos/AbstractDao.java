@@ -21,12 +21,18 @@ public abstract class AbstractDao<T, I> {
             em.persist(t);
             em.getTransaction().commit();
             return t;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
     public T findById(I id) {
         try (EntityManager em = emf.createEntityManager()) {
             return em.find(entityClass, id);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -34,15 +40,21 @@ public abstract class AbstractDao<T, I> {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "SELECT t FROM " + entityClass.getSimpleName() + " t";
             return em.createQuery(jpql, entityClass).getResultList();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
     public T update(T t) {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
-            em.merge(t);
+            t = em.merge(t);
             em.getTransaction().commit();
             return t;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -54,6 +66,8 @@ public abstract class AbstractDao<T, I> {
                     .setParameter("id", id)
                     .executeUpdate();
             em.getTransaction().commit();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
         }
     }
 }
