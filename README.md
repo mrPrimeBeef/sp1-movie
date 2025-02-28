@@ -1,4 +1,4 @@
-forståelse af projektet:
+**forståelse af projektet:**
 
 Der er en *buildMain som står for en Run Once, for at oprette databasen. Så er der FuncMain som står for functionaliteten af databasen, altså står den for at arbejde med databasen, hvor buildMain fetch data og bygge den.
 
