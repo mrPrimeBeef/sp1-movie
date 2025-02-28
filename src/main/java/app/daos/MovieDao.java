@@ -1,7 +1,11 @@
 package app.daos;
 
 import java.util.List;
+import java.util.Set;
 
+import app.dtos.MemberDto;
+import app.dtos.MovieDto;
+import app.entities.Person;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -23,6 +27,33 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
         }
         return instance;
     }
+
+
+//    public void createMovie(MovieDto movie, Set<MemberDto> members){
+//
+//        try (EntityManager em = emf.createEntityManager()) {
+//            em.getTransaction().begin();
+//
+//            for(MemberDto m:members){
+//
+//
+//            }
+//
+//            em.merge(new())
+//
+//            em.persist(t);
+//
+//
+//
+//
+//
+//
+//            em.getTransaction().commit();
+//        }
+//
+//
+//    }
+
 
     public List<Genre> FindAllGenreByMovieTitle(String title) {
         try (EntityManager em = emf.createEntityManager()) {

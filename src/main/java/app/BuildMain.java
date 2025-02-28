@@ -22,22 +22,27 @@ public class BuildMain {
         MovieDao movieDao = MovieDao.getInstance(emf);
         PersonDao personDao = PersonDao.getInstance(emf);
 
-
         Set<GenreDto> genres = TmdbService.getGenres();
-        genres.forEach(System.out::println);
+
 
         Set<MovieDto> movies = TmdbService.getDanishMoviesSince2020();
         movies.forEach(System.out::println);
 
-        for(MovieDto movie:movies){
+//        for(MovieDto movie:movies){
+//
+//            Set<MemberDto> members = TmdbService.getMembersForMovieId(movie.id());
+//
+//            for(MemberDto member:members){
+//                personDao.update(member);
+//            }
+//
+//
+//        }
 
-            Set<MemberDto> members = TmdbService.getMembersForMovieId(movie.id());
-
-            for(MemberDto member:members){
-                personDao.update(member);
-            }
-
+        for(GenreDto g:genres){
+            genreDao.update(g);
         }
+
 
         emf.close();
 
