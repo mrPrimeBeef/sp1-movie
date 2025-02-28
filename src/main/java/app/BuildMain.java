@@ -11,7 +11,7 @@ public class BuildMain {
 
     public static void main(String[] args) {
 
-        Set<GenreDto> genres = TmdbService.getAllGenres();
+        Set<GenreDto> genres = TmdbService.getGenres();
         genres.forEach(System.out::println);
 
         Set<MovieDto> movies = TmdbService.getDanishMoviesSince2020();
