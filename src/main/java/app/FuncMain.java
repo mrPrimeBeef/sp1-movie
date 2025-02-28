@@ -20,8 +20,8 @@ public class FuncMain {
 //
 //        System.out.println("All movies with genre comedy: " + movieDao.FindAllMoivesByGenre("Comedy"));
 
-//        System.out.println(movieDao.searchMovieByString("wild men"));
-//
+        System.out.println(movieDao.searchMovieByString("River of Blood"));
+
 //        System.out.println("average rating for all movies in DB: " + movieDao.averageRatingOfAllMoviesInDB());
 
 //        System.out.println("average rating for lowest rated movies in DB: " + movieDao.averageTop10LowestRating());
@@ -30,6 +30,6 @@ public class FuncMain {
 
 //        System.out.println(directorDao.findDirectorsByMovie(2));
 
-//        System.out.println(actorDao.findActorsByMovie(2));
+        System.out.println(actorDao.findActorsByMovie(1));
     }
 }
