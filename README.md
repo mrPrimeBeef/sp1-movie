@@ -6,6 +6,6 @@ I TMDBServices for at hente film bliver der brugt newScheduledThreadPool, ellers
 
 OBS: hvis man køre BuildMain skal man opdatere hibernateConfig til at create, hvorimod hvis du køre andre steder fra skal den opdateres til "update"
 
-*BuildMain laver: genre -> film -> directors -> actors, under actors skal den så tilføje realtioner hvilket tager lang tid over 40 min (man burde kigge på noget optimering her).
+*BuildMain laver: genre -> film -> directors -> actors, under actors skal den så tilføje realtioner hvilket tager lang tid (ca. 1 time hvis der hentes 5 års danske film). (man burde kigge på noget optimering her).
 Både Actors og Director bliver hentet med tråde.
 Der er også en udkommenteret metode - saveTestDataAsJson(den er lavet på "2 pages" indholde) som har været til for at lave testdata som kunne bruges i dao testsne, hvis den "bruges" på ny skal man formodenligt også opdatere testsne.
