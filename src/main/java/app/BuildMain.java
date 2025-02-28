@@ -35,9 +35,6 @@ public class BuildMain {
 //        ExecutorService executor = Executors.newCachedThreadPool();
         ExecutorService executor = Executors.newFixedThreadPool(3);
 
-//        ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
-
-
         // Get genreDtos from TmdbService, convert to Genre entities and create in database
         Set<Genre> genres = TmdbService
                 .getGenres()
@@ -54,23 +51,21 @@ public class BuildMain {
                     .collect(Collectors.toUnmodifiableSet());
 
             Movie movie = new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.releaseDate(), genresForThisMovie, null, m.overview());
-            movies.add(movieDao.create(movie));
+            movieDao.create(movie);
+            movies.add(movie);
         }
 
-        long timeA = System.currentTimeMillis();
 
         // Start concurrent runnable tasks
+        long startTime = System.currentTimeMillis();
         List<Future> futures = new LinkedList<>();
         for (Movie movie : movies) {
-
-            long startTime = System.currentTimeMillis();
 
             Runnable task = new TaskGetCreditsForMovie(movie);
             futures.add(executor.submit(task));
 
-            long sleepTime = Math.max(DELAY_MILLISECONDS - (System.currentTimeMillis() - startTime), 0);
             try {
-                Thread.sleep(sleepTime);
+                Thread.sleep(DELAY_MILLISECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -78,16 +73,15 @@ public class BuildMain {
         }
 
         // Wait for tasks to finish
-        for (Future f : futures) {
+        for (Future future : futures) {
             try {
-                f.get(); // blocking call
+                future.get(); // blocking call
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        long timeB = System.currentTimeMillis();
-        System.out.println(timeB - timeA);
+        System.out.println("Time it took: " + (System.currentTimeMillis() - startTime));
 
         emf.close();
         executor.shutdown();
