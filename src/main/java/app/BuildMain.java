@@ -4,10 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -32,7 +29,11 @@ public class BuildMain {
 
     public static void main(String[] args) {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executor = Executors.newCachedThreadPool();
+//        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+//        ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
+
 
         // Get genreDtos from TmdbService, convert to Genre entities and create in database
         Set<Genre> genres = TmdbService
@@ -57,7 +58,8 @@ public class BuildMain {
         // Start concurrent runnable tasks
         List<Future> futures = new LinkedList<>();
         for (Movie movie : movies) {
-            futures.add(executorService.submit(new RunnableTaskGetCreditsForMovie(movie)));
+            Runnable task = new TaskGetCreditsForMovie(movie);
+            futures.add(executor.submit(task));
         }
 
         // Wait for tasks to finish
@@ -70,29 +72,30 @@ public class BuildMain {
         }
 
         emf.close();
-        executorService.shutdown();
+        executor.shutdown();
 
     }
 
 
-    private static class RunnableTaskGetCreditsForMovie implements Runnable {
+    private static class TaskGetCreditsForMovie implements Runnable {
 
-        Movie movie;
+        private static final int MAX_TASKS_PER_SECOND = 30; // Documentation says around 40 per second
+        private static final long DELAY_MILLISECONDS = 1000 / MAX_TASKS_PER_SECOND;
 
-        RunnableTaskGetCreditsForMovie(Movie movie) {
+        private Movie movie;
+
+        TaskGetCreditsForMovie(Movie movie) {
             this.movie = movie;
         }
 
         @Override
         public void run() {
 
-            System.out.println(movie.getId());
+            long startTime = System.currentTimeMillis();
 
             // Remember a person can be member twice in this movie
             // Loop though members of this movie, create them as a person if they are not already created
             for (MemberDto member : TmdbService.getMembersForMovie(movie.getId())) {
-
-                System.out.println(member);
 
                 // Get or create person in database
                 Person person = personDao.update(new Person(member.id(), member.name(), member.gender(), member.popularity(), null));
@@ -103,7 +106,15 @@ public class BuildMain {
             }
 
             movieDao.update(movie);
+
             System.out.println(movie);
+
+            try {
+                long sleepTime = Math.max(DELAY_MILLISECONDS - (System.currentTimeMillis() - startTime), 0);
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
         }
 
