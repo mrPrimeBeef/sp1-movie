@@ -25,16 +25,16 @@ public class HibernateConfig {
         return isTest;
     }
 
-    public static EntityManagerFactory getEntityManagerFactory() {
+    public static EntityManagerFactory getEntityManagerFactory(String hbm2ddlAutoProperty) {
         if (emf == null)
-            emf = createEMF(getTest());
+            emf = createEMF(getTest(), hbm2ddlAutoProperty);
         return emf;
     }
 
     public static EntityManagerFactory getEntityManagerFactoryForTest() {
         if (emfTest == null) {
             setTest(true);
-            emfTest = createEMF(getTest());  // No DB needed for test
+            emfTest = createEMF(getTest(), "create-drop");  // No DB needed for test
         }
         return emfTest;
     }
@@ -48,12 +48,12 @@ public class HibernateConfig {
 
     }
 
-    private static EntityManagerFactory createEMF(boolean forTest) {
+    private static EntityManagerFactory createEMF(boolean forTest, String hbm2ddlAutoProperty) {
         try {
             Configuration configuration = new Configuration();
             Properties props = new Properties();
             // Set the properties
-            setBaseProperties(props);
+            setBaseProperties(props, hbm2ddlAutoProperty);
             if (forTest) {
                 props = setTestProperties(props);
             } else if (System.getenv("DEPLOYED") != null) {
@@ -76,10 +76,10 @@ public class HibernateConfig {
         }
     }
 
-    private static Properties setBaseProperties(Properties props) {
+    private static Properties setBaseProperties(Properties props, String hbm2ddlAutoProperty) {
         props.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         props.put("hibernate.connection.driver_class", "org.postgresql.Driver");
-        props.put("hibernate.hbm2ddl.auto", "create");
+        props.put("hibernate.hbm2ddl.auto", hbm2ddlAutoProperty);
         props.put("hibernate.current_session_context_class", "thread");
         props.put("hibernate.show_sql", "false");
         props.put("hibernate.format_sql", "false");

@@ -1,6 +1,7 @@
 package app.entities;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,11 +30,11 @@ public class Movie {
     private double popularity;
     private LocalDate releaseDate;
 
-    @ManyToMany
-    private List<Genre> genres;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Genre> genres = new ArrayList<>();
 
     @Setter
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Set<Credit> credits = new HashSet<>();
 
 }

@@ -1,13 +1,13 @@
 package app.daos;
 
-import app.entities.Genre;
+import java.util.List;
+
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.entities.Movie;
-import jakarta.persistence.TypedQuery;
-
-import java.util.List;
+import app.entities.Genre;
 
 public class MovieDao extends AbstractDao<Movie, Integer> {
 

@@ -7,7 +7,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 public class FuncMain {
     public static void main(String[] args) {
-        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory("update");
         MovieDao movieDao = MovieDao.getInstance(emf);
 
         movieDao.findAll().forEach(System.out::println);

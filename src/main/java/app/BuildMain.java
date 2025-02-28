@@ -16,7 +16,7 @@ public class BuildMain {
 
     public static void main(String[] args) {
 
-        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory("create");
         GenreDao genreDao = GenreDao.getInstance(emf);
         MovieDao movieDao = MovieDao.getInstance(emf);
 

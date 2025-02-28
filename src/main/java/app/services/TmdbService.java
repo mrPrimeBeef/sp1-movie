@@ -20,7 +20,7 @@ public class TmdbService {
 
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
-    private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+    private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory("create");
     private static final PersonDao personDao = PersonDao.getInstance(emf);
 
     public static void shutdown() {
