@@ -1,6 +1,5 @@
 package app.entities;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -24,7 +23,6 @@ public class Person {
     private double popularity;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", fetch=FetchType.LAZY)
     private Set<Credit> credits;
-//    private Set<Credit> credits = new HashSet<>();
 }
