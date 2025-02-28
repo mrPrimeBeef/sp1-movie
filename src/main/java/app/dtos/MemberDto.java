@@ -2,7 +2,7 @@ package app.dtos;
 
 import app.entities.Gender;
 
-public record PersonDto(
+public record MemberDto(
         Integer id,
         String name,
         Gender gender,

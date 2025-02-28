@@ -9,7 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import app.dtos.MovieDto;
 import app.dtos.GenreDto;
-import app.dtos.PersonDto;
+import app.dtos.MemberDto;
 import app.utils.ApiReader;
 import app.utils.Utils;
 
@@ -24,13 +24,17 @@ public class TmdbService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        GenresResponseDto response;
+
         try {
-            GenresResponseDto response = objectMapper.readValue(json, GenresResponseDto.class);
-            return response.genres;
+            response = objectMapper.readValue(json, GenresResponseDto.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
+
+        return response.genres;
 
     }
 
@@ -70,7 +74,7 @@ public class TmdbService {
     }
 
 
-    public static Set<PersonDto> getPersonsForMovieId(int movieId) {
+    public static Set<MemberDto> getMembersForMovieId(int movieId) {
 
         String url = "https://api.themoviedb.org/3/movie/" + movieId + "/credits?api_key=" + ApiKey;
         String json = ApiReader.getDataFromUrl(url);
@@ -87,21 +91,21 @@ public class TmdbService {
             return null;
         }
 
-        Set<PersonDto> persons = new HashSet<>();
+        Set<MemberDto> members = new HashSet<>();
 
-        for (PersonDto p : response.cast) {
-            persons.add(new PersonDto(p.id(), p.name(), p.gender(), p.popularity(), "Actor", p.character()));
+        for (MemberDto m : response.cast) {
+            members.add(new MemberDto(m.id(), m.name(), m.gender(), m.popularity(), "Actor", m.character()));
         }
 
-        persons.addAll(response.crew);
+        members.addAll(response.crew);
 
-        return persons;
+        return members;
 
     }
 
     private record CreditsResponseDto(
-            Set<PersonDto> cast,
-            Set<PersonDto> crew) {
+            Set<MemberDto> cast,
+            Set<MemberDto> crew) {
     }
 
     private record MovieResponseDto(Set<MovieDto> results) {
