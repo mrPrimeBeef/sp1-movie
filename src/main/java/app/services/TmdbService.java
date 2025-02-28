@@ -150,21 +150,6 @@ public class TmdbService {
             String character) {
     }
 
-//    private record CastMember(
-//            Integer id,
-//            String name,
-//            Gender gender,
-//            Double popularity,
-//            String character) {
-//    }
-//
-//    private record CrewMember(
-//            Integer id,
-//            String name,
-//            Gender gender,
-//            Double popularity,
-//            String job) {
-//    }
 
 
     private record MovieResponseDto(MovieResult[] results) {

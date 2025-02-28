@@ -7,8 +7,8 @@ import jakarta.persistence.EntityManagerFactory;
 
 public abstract class AbstractDao<T, I> {
 
-    protected final EntityManagerFactory emf;
     protected final Class<T> entityClass;
+    protected final EntityManagerFactory emf;
 
     protected AbstractDao(Class<T> entityClass, EntityManagerFactory emf) {
         this.entityClass = entityClass;
