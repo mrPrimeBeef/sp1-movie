@@ -4,10 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import app.daos.DirectorDao;
 import app.entities.*;
@@ -73,7 +70,7 @@ public class BuildMain {
             Future<List<ActorWithRole>> future = entry.getValue();
 
             try {
-                List<ActorWithRole> actorsInThisMovie = future.get();
+                List<ActorWithRole> actorsInThisMovie = future.get(10, TimeUnit.SECONDS);
                 Set<JoinMovieActor> joins = new HashSet<>();
 
                 for (ActorWithRole actorWithRole : actorsInThisMovie) {
@@ -102,11 +99,20 @@ public class BuildMain {
 
                 movieDao.update(movie);
 
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         executor.shutdown();
+        try {
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static HashSet<Director> addDirectors(List<Movie> movies, DirectorDao directorDao, MovieDao movieDao) {
@@ -147,6 +153,14 @@ public class BuildMain {
             }
         }
         executor.shutdown();
+        try {
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
         return allDirectorsInAllMovies;
     }
 
