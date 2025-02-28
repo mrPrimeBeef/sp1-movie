@@ -1,10 +1,12 @@
 package app.daos;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import app.dtos.MemberDto;
 import app.dtos.MovieDto;
+import app.entities.Credit;
 import app.entities.Person;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.EntityManager;
@@ -26,10 +28,6 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
             instance = new MovieDao(emf);
         }
         return instance;
-    }
-
-    public Movie create(MovieDto m, Set<Genre> genres) {
-        return create(new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.releaseDate(), genres, null, m.overview()));
     }
 
 

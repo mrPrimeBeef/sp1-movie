@@ -1,6 +1,7 @@
 package app.entities;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -34,5 +35,12 @@ public class Movie {
 
     @Column(length = 1000)
     private String overview;
+
+    public void addCredit(Person person, String job, String character) {
+        if (credits == null) {
+            credits = new HashSet<>();
+        }
+        credits.add(new Credit(null, this, person, job, character));
+    }
 
 }
