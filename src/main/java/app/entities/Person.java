@@ -23,6 +23,6 @@ public class Person {
     private double popularity;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "person", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private Set<Credit> credits;
 }

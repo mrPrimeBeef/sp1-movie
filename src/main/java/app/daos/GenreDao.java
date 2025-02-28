@@ -1,9 +1,9 @@
 package app.daos;
 
-import app.dtos.GenreDto;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.entities.Genre;
+import app.dtos.GenreDto;
 
 public class GenreDao extends AbstractDao<Genre, Integer> {
 

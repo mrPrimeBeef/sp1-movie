@@ -24,12 +24,10 @@ public class Movie {
     private double popularity;
     private LocalDate releaseDate;
 
-    @Setter
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Genre> genres;
 
     @ToString.Exclude
-    @Setter
     @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Credit> credits;
 

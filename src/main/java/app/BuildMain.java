@@ -47,18 +47,16 @@ public class BuildMain {
 
                 Person person = personDao.findById(member.id());
                 if (person == null) {
-                    person = personDao.create(member);
+                    person = personDao.create(new Person(member.id(), member.name(), member.gender(), member.popularity(), null));
                 }
 
                 movie.addCredit(person, member.job(), member.character());
-
 
             }
 
             movieDao.create(movie);
 
         }
-
 
         emf.close();
 
