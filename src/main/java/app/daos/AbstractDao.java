@@ -2,6 +2,8 @@ package app.daos;
 
 import java.util.List;
 
+import app.exceptions.ApiException;
+import app.exceptions.PersistExeception;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -21,12 +23,16 @@ public abstract class AbstractDao<T, I> {
             em.persist(t);
             em.getTransaction().commit();
             return t;
+        } catch (Exception e) {
+            throw new PersistExeception("Error in create(): " + t.getClass());
         }
     }
 
     public T findById(I id) {
         try (EntityManager em = emf.createEntityManager()) {
             return em.find(entityClass, id);
+        } catch (Exception e) {
+            throw new PersistExeception("Error in finding " + entityClass + " with id: " + id);
         }
     }
 
@@ -34,6 +40,8 @@ public abstract class AbstractDao<T, I> {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "SELECT t FROM " + entityClass.getSimpleName() + " t";
             return em.createQuery(jpql, entityClass).getResultList();
+        } catch (Exception e) {
+            throw new PersistExeception("Error in finding all of :" + entityClass);
         }
     }
 
@@ -43,6 +51,8 @@ public abstract class AbstractDao<T, I> {
             em.merge(t);
             em.getTransaction().commit();
             return t;
+        } catch (Exception e) {
+            throw new PersistExeception("Error in updating :" + t);
         }
     }
 
@@ -54,6 +64,8 @@ public abstract class AbstractDao<T, I> {
                     .setParameter("id", id)
                     .executeUpdate();
             em.getTransaction().commit();
+        } catch (Exception e) {
+            throw new PersistExeception("Error in delting " + entityClass + " with id: " + id);
         }
     }
 }

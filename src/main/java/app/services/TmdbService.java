@@ -4,12 +4,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import app.dtos.DirectorDTO;
 import app.dtos.GenreDTO;
 import app.dtos.MovieActorDTO;
 import app.dtos.MovieDTO;
+import app.exceptions.ApiException;
+import app.threads.CallableThread;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -34,14 +37,14 @@ public class TmdbService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
+
         try {
-            // TODO: HUsk at slette page<2 Der skal også laves threads, så der ikke fås 429 kode(too many api requests)
-            for (int page = 1; page < 2; page++) {
-
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            for (int page = 1; ; page++) {
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
-                String json = ApiReader.getDataFromUrl(url);
+                Future<String> json = scheduler.schedule(new CallableThread(url), page + 350, TimeUnit.MILLISECONDS);
 
-                MovieResponseDto response = objectMapper.readValue(json, MovieResponseDto.class);
+                MovieResponseDto response = objectMapper.readValue(json.get(), MovieResponseDto.class);
                 for (MovieResult r : response.results) {
 
                     // Use genreMap to go from tmdbId to Genre entity
@@ -57,11 +60,16 @@ public class TmdbService {
                     break;
                 }
             }
+            scheduler.shutdown();
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
             return movies;
+
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ApiException("There is an error in getting the API in getDanishMoviesSince2020()");
         }
-        return null;
     }
 
     public static MovieCastDTO getCrewAndActorsDetails(String movieId) {
@@ -79,6 +87,7 @@ public class TmdbService {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ApiException("There is an error in getting the API in getCrewAndActorsDetails()");
         }
         return movieCastDTO;
     }
@@ -101,9 +110,8 @@ public class TmdbService {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ApiException("There is an error in getting the API in getCrewAndActorsDetails()");
         }
-
-        return null;
     }
 
     public static Actor convertFromActorDtoToActor(CastDTO actorDTO) {

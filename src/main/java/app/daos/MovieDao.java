@@ -1,6 +1,8 @@
 package app.daos;
 
 import app.entities.Genre;
+import app.exceptions.ApiException;
+import app.exceptions.PersistExeception;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -27,9 +29,11 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
     public List<Genre> FindAllGenreByMovieTitle(String title) {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "SELECT g FROM Movie m JOIN m.genres g WHERE m.title = :title";
-            TypedQuery query = em.createQuery(jpql, Genre.class);
+            TypedQuery<Genre> query = em.createQuery(jpql, Genre.class);
             query.setParameter("title", title);
             return query.getResultList();
+        } catch (Exception e) {
+            throw new PersistExeception("Error in FindAllGenreByMovieTitle() with the title: " + title);
         }
     }
 
@@ -39,6 +43,8 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
             TypedQuery query = em.createQuery(jpql, Movie.class);
             query.setParameter("genre", genre);
             return query.getResultList();
+        } catch (Exception e) {
+            throw new PersistExeception("Error in FindAllMoivesByGenre() with the genre: " + genre);
         }
     }
 
@@ -48,6 +54,8 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
             TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
             query.setParameter("title", title);
             return query.getSingleResult();
+        } catch (Exception e) {
+            throw new PersistExeception("Error in searchMovieByString() with the title: " + title);
         }
     }
 
@@ -56,6 +64,8 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
             String jqpl = "SELECT AVG(m.popularity) FROM Movie m";
             TypedQuery<Double> query = em.createQuery(jqpl, Double.class);
             return query.getSingleResult();
+        } catch (Exception e) {
+            throw new PersistExeception("Error in averageRatingOfAllMoviesInDB()");
         }
     }
 
@@ -76,6 +86,8 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
             }
 
             return sum / top10LowestMovies.size();
+        } catch (Exception e) {
+            throw new PersistExeception("Error in averageTop10LowestRating()");
         }
     }
 
@@ -96,6 +108,8 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
             }
 
             return sum / top10HigstMovies.size();
+        }catch (Exception e) {
+            throw new PersistExeception("Error in averageTop10HigestRating()");
         }
     }
 }
