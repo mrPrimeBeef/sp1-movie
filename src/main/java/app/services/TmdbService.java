@@ -74,7 +74,7 @@ public class TmdbService {
     }
 
 
-    public static Set<MemberDto> getMembersForMovieId(int movieId) {
+    public static Set<MemberDto> getMembersForMovie(int movieId) {
 
         String url = "https://api.themoviedb.org/3/movie/" + movieId + "/credits?api_key=" + ApiKey;
         String json = ApiReader.getDataFromUrl(url);

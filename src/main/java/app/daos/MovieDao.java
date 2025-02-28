@@ -28,6 +28,10 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
         return instance;
     }
 
+    public Movie create(MovieDto m, Set<Genre> genres) {
+        return create(new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.releaseDate(), genres, null, m.overview()));
+    }
+
 
 //    public void createMovie(MovieDto movie, Set<MemberDto> members){
 //

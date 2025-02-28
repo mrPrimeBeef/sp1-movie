@@ -21,8 +21,8 @@ public class GenreDao extends AbstractDao<Genre, Integer> {
     }
 
 
-    public Genre update(GenreDto g) {
-        return update(new Genre(g.id(), g.name()));
+    public Genre create(GenreDto g) {
+        return create(new Genre(g.id(), g.name()));
     }
 
 
