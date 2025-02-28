@@ -3,14 +3,18 @@ package app;
 import app.config.HibernateConfig;
 import app.daos.GenreDao;
 import app.daos.MovieDao;
+import app.daos.PersonDao;
 import jakarta.persistence.EntityManagerFactory;
 
 public class FuncMain {
     public static void main(String[] args) {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory("update");
         MovieDao movieDao = MovieDao.getInstance(emf);
+        PersonDao personDao = PersonDao.getInstance(emf);
 
         movieDao.findAll().forEach(System.out::println);
+
+        personDao.findAll().forEach(System.out::println);
 
 //        System.out.println( "Wild Men genres: " + movieDao.FindAllGenreByMovieTitle("Wild Men"));
 //

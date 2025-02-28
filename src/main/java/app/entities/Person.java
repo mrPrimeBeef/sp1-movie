@@ -23,6 +23,8 @@ public class Person {
 
     private double popularity;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "person")
-    private Set<Credit> credits = new HashSet<>();
+    private Set<Credit> credits;
+//    private Set<Credit> credits = new HashSet<>();
 }
