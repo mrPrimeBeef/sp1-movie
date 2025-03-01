@@ -13,25 +13,24 @@ public class FuncMain {
         MovieDao movieDao = MovieDao.getInstance(emf);
         PersonDao personDao = PersonDao.getInstance(emf);
 
-        System.out.println("A list of all movies pulled from the database:");
-        movieDao.readAll().forEach(System.out::println);
-
-        System.out.println("\nA list of all persons pulled from the database:");
-        personDao.readAll().forEach(System.out::println);
-
-
-
-//        System.out.println( "Wild Men genres: " + movieDao.FindAllGenreByMovieTitle("Wild Men"));
+//        System.out.println("List of all movies pulled from the database:");
+//        movieDao.readAll().forEach(System.out::println);
 //
-//        System.out.println("All movies with genre comedy: " + movieDao.FindAllMoivesByGenre("Comedy"));
+//        System.out.println("\nList of all persons pulled from the database:");
+//        personDao.readAll().forEach(System.out::println);
 
-//        System.out.println(movieDao.searchMovieByString("wild men"));
-//
-//        System.out.println("average rating for all movies in DB: " + movieDao.averageRatingOfAllMoviesInDB());
+        System.out.println("\nGenres in the movie 'Wild Men':");
+        System.out.println(movieDao.FindAllGenreByMovieTitle("Wild Men"));
 
-//        System.out.println("average rating for lowest rated movies in DB: " + movieDao.averageTop10LowestRating());
+        System.out.println("All movies with genre comedy: " + movieDao.FindAllMoivesByGenre("Comedy"));
 
-//        System.out.println("average rating for higst rated movies in DB: " + movieDao.averageTop10HigestRating());
+        System.out.println(movieDao.searchMovieByString("wild men"));
+
+        System.out.println("average rating for all movies in DB: " + movieDao.averageRatingOfAllMoviesInDB());
+
+        System.out.println("average rating for lowest rated movies in DB: " + movieDao.averageTop10LowestRating());
+
+        System.out.println("average rating for higst rated movies in DB: " + movieDao.averageTop10HigestRating());
 
 
         emf.close();

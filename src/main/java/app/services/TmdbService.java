@@ -9,7 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import app.dtos.MovieDto;
 import app.dtos.GenreDto;
-import app.dtos.MemberDto;
+import app.dtos.CreditDto;
 import app.utils.ApiReader;
 import app.utils.Utils;
 
@@ -47,16 +47,16 @@ public class TmdbService {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
 
-        // TODO: HUsk at slette page<2
+        // TODO: Slet page<2
         for (int page = 1; ; page++) {
 
             String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
             String json = ApiReader.getDataFromUrl(url);
 
-            MovieResponseDto response;
+            MoviesResponseDto response;
 
             try {
-                response = objectMapper.readValue(json, MovieResponseDto.class);
+                response = objectMapper.readValue(json, MoviesResponseDto.class);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
                 return null;
@@ -74,7 +74,7 @@ public class TmdbService {
     }
 
 
-    public static Set<MemberDto> getMembersForMovie(int movieId) {
+    public static Set<CreditDto> getCreditsForMovie(int movieId) {
 
         String url = "https://api.themoviedb.org/3/movie/" + movieId + "/credits?api_key=" + ApiKey;
         String json = ApiReader.getDataFromUrl(url);
@@ -91,24 +91,24 @@ public class TmdbService {
             return null;
         }
 
-        Set<MemberDto> members = new HashSet<>();
+        Set<CreditDto> credits = new HashSet<>();
 
-        for (MemberDto m : response.cast) {
-            members.add(new MemberDto(m.id(), m.name(), m.gender(), m.popularity(), "Actor", m.character()));
+        for (CreditDto c : response.cast) {
+            credits.add(new CreditDto(c.personId(), c.name(), c.gender(), c.popularity(), "Actor", c.character()));
         }
 
-        members.addAll(response.crew);
+        credits.addAll(response.crew);
 
-        return members;
+        return credits;
 
     }
 
     private record CreditsResponseDto(
-            Set<MemberDto> cast,
-            Set<MemberDto> crew) {
+            Set<CreditDto> cast,
+            Set<CreditDto> crew) {
     }
 
-    private record MovieResponseDto(Set<MovieDto> results) {
+    private record MoviesResponseDto(Set<MovieDto> results) {
     }
 
     private record GenresResponseDto(Set<GenreDto> genres) {

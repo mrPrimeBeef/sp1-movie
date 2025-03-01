@@ -1,9 +1,12 @@
 package app.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import app.entities.Gender;
 
-public record MemberDto(
-        Integer id,
+public record CreditDto(
+        @JsonProperty("id")
+        Integer personId,
         String name,
         Gender gender,
         Double popularity,

@@ -14,7 +14,7 @@ import app.daos.GenreDao;
 import app.daos.MovieDao;
 import app.daos.PersonDao;
 import app.dtos.MovieDto;
-import app.dtos.MemberDto;
+import app.dtos.CreditDto;
 import app.entities.Genre;
 import app.entities.Movie;
 import app.entities.Person;
@@ -27,12 +27,14 @@ public class BuildMain {
     private static final MovieDao movieDao = MovieDao.getInstance(emf);
     private static final PersonDao personDao = PersonDao.getInstance(emf);
 
-    private static final int MAX_TASKS_PER_SECOND = 30; // Documentation says around 40 per second
-    private static final long DELAY_MILLISECONDS = 1000 / MAX_TASKS_PER_SECOND;
+    // TMDB says that approx. 40 request per second are allowed: https://www.themoviedb.org/talk/66eb8e189bd4250430746c22
+    // To be on the safe side, this program limits to 30 requests per second
+    private static final int MAX_REQUESTS_PER_SECOND = 30;
+    private static final long DELAY_MILLISECONDS = 1000 / MAX_REQUESTS_PER_SECOND;
 
     public static void main(String[] args) {
 
-//        ExecutorService executor = Executors.newCachedThreadPool();
+        // Uses a fixed size thread pool. CachedThreadPool was tried, but was too fast for the database
         ExecutorService executor = Executors.newFixedThreadPool(3);
 
         // Get genreDtos from TmdbService, convert to Genre entities and create in database
@@ -102,13 +104,13 @@ public class BuildMain {
 
             // Remember a person can be member twice in this movie
             // Loop though members of this movie, create them as a person if they are not already created
-            for (MemberDto member : TmdbService.getMembersForMovie(movie.getId())) {
+            for (CreditDto c : TmdbService.getCreditsForMovie(movie.getId())) {
 
                 // Get or create person in database
-                Person person = personDao.update(new Person(member.id(), member.name(), member.gender(), member.popularity(), null));
+                Person person = personDao.update(new Person(c.personId(), c.name(), c.gender(), c.popularity(), null));
 
                 // Add credit to movie entity in memory
-                movie.addCredit(person, member.job(), member.character());
+                movie.addCredit(person, c.job(), c.character());
 
             }
 
