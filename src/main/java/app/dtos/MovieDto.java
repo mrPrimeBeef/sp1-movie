@@ -3,7 +3,7 @@ package app.dtos;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 public record MovieDto(Integer id,
                        String title,
@@ -16,7 +16,7 @@ public record MovieDto(Integer id,
                        @JsonProperty("release_date")
                        LocalDate releaseDate,
                        @JsonProperty("genre_ids")
-                       List<Integer> genreIds,
+                       Set<Integer> genreIds,
                        String overview
 ) {
 }
