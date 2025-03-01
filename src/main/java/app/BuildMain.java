@@ -103,7 +103,7 @@ public class BuildMain {
 
             for (CreditDto c : TmdbService.getCreditsForMovie(movie.getId())) {
 
-                // Get or create person in database
+                // This creates person in database if it does not already exist
                 Person person = personDao.update(new Person(c.personId(), c.name(), c.gender(), c.popularity(), null));
 
                 movie.addCredit(person, c.job(), c.character());
@@ -111,6 +111,7 @@ public class BuildMain {
             }
 
             movieDao.update(movie);
+
             System.out.println(movie);
 
         }

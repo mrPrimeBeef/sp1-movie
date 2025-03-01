@@ -19,6 +19,5 @@ public class Credit {
     private Person person;
 
     private String job;
-
     private String character;
 }
