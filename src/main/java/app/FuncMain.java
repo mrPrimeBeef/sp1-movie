@@ -8,13 +8,18 @@ import jakarta.persistence.EntityManagerFactory;
 
 public class FuncMain {
     public static void main(String[] args) {
+
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory("update");
         MovieDao movieDao = MovieDao.getInstance(emf);
         PersonDao personDao = PersonDao.getInstance(emf);
 
-        movieDao.findAll().forEach(System.out::println);
+        System.out.println("A list of all movies pulled from the database:");
+        movieDao.readAll().forEach(System.out::println);
 
-        personDao.findAll().forEach(System.out::println);
+        System.out.println("\nA list of all persons pulled from the database:");
+        personDao.readAll().forEach(System.out::println);
+
+
 
 //        System.out.println( "Wild Men genres: " + movieDao.FindAllGenreByMovieTitle("Wild Men"));
 //

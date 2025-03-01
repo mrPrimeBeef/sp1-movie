@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.TypedQuery;
 
 public abstract class AbstractDao<T, I> {
 
@@ -27,7 +28,7 @@ public abstract class AbstractDao<T, I> {
         }
     }
 
-    public T findById(I id) {
+    public T readById(I id) {
         try (EntityManager em = emf.createEntityManager()) {
             return em.find(entityClass, id);
         } catch (RuntimeException e) {
@@ -36,10 +37,11 @@ public abstract class AbstractDao<T, I> {
         }
     }
 
-    public List<T> findAll() {
+    public List<T> readAll() {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "SELECT t FROM " + entityClass.getSimpleName() + " t";
-            return em.createQuery(jpql, entityClass).getResultList();
+            TypedQuery<T> query = em.createQuery(jpql, entityClass);
+            return query.getResultList();
         } catch (RuntimeException e) {
             e.printStackTrace();
             return null;
@@ -58,16 +60,15 @@ public abstract class AbstractDao<T, I> {
         }
     }
 
-    public void delete(I id) {
+    public void deleteById(I id) {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "DELETE FROM " + entityClass.getSimpleName() + " t WHERE t.id = :id";
             em.getTransaction().begin();
-            em.createQuery(jpql)
-                    .setParameter("id", id)
-                    .executeUpdate();
+            em.createQuery(jpql).setParameter("id", id).executeUpdate();
             em.getTransaction().commit();
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
     }
+
 }
