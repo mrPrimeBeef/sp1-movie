@@ -1,6 +1,5 @@
-# SP-1: Building a Movie Repository
-## Peters solution
+# Peters solution to SP-1: Building a Movie Repository
 
-BuildMain has main method to build the database (one time operation)
+BuildMain.java has main method to build the database (one time operation)
 
-FuncMain has main method which shows of the functionality
+FuncMain.java has main method which shows of the functionality
