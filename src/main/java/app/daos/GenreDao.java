@@ -3,7 +3,6 @@ package app.daos;
 import jakarta.persistence.EntityManagerFactory;
 
 import app.entities.Genre;
-import app.dtos.GenreDto;
 
 public class GenreDao extends AbstractDao<Genre, Integer> {
 
@@ -19,11 +18,5 @@ public class GenreDao extends AbstractDao<Genre, Integer> {
         }
         return instance;
     }
-
-
-    public Genre create(GenreDto g) {
-        return create(new Genre(g.id(), g.name()));
-    }
-
 
 }

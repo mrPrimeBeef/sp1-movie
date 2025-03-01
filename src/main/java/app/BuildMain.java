@@ -13,8 +13,9 @@ import app.config.HibernateConfig;
 import app.daos.GenreDao;
 import app.daos.MovieDao;
 import app.daos.PersonDao;
-import app.dtos.MovieDto;
 import app.dtos.CreditDto;
+import app.dtos.GenreDto;
+import app.dtos.MovieDto;
 import app.entities.Genre;
 import app.entities.Movie;
 import app.entities.Person;
@@ -27,24 +28,23 @@ public class BuildMain {
     private static final MovieDao movieDao = MovieDao.getInstance(emf);
     private static final PersonDao personDao = PersonDao.getInstance(emf);
 
-    // TMDB says that approx. 40 request per second are allowed: https://www.themoviedb.org/talk/66eb8e189bd4250430746c22
+    // TMDB says that approx. 40 requests per second are allowed: https://www.themoviedb.org/talk/66eb8e189bd4250430746c22
     // To be on the safe side, this program limits to 30 requests per second
     private static final int MAX_REQUESTS_PER_SECOND = 30;
     private static final long DELAY_MILLISECONDS = 1000 / MAX_REQUESTS_PER_SECOND;
 
     public static void main(String[] args) {
 
-        // Uses a fixed size thread pool. CachedThreadPool was tried, but was too fast for the database
+        // Uses a fixed size thread pool. CachedThreadPool was tried, but was too fast for the database access
         ExecutorService executor = Executors.newFixedThreadPool(3);
 
-        // Get genreDtos from TmdbService, convert to Genre entities and create in database
-        Set<Genre> genres = TmdbService
-                .getGenres()
-                .stream()
-                .map(genreDao::create)
-                .collect(Collectors.toUnmodifiableSet());
+        // Get all genres from TMDB and persist them in database
+        Set<Genre> genres = new HashSet<>();
+        for (GenreDto g : TmdbService.getGenres()) {
+            genres.add(genreDao.create(new Genre(g.id(), g.name())));
+        }
 
-
+        // Get all danish movies since 2020 from TMDB and persist them in database
         Set<Movie> movies = new HashSet<>();
         for (MovieDto m : TmdbService.getDanishMoviesSince2020()) {
 
@@ -58,32 +58,31 @@ public class BuildMain {
         }
 
 
-        // Start concurrent runnable tasks
+        // Loop through movies and get their credits from TMDB and persists them to database
+        // This is done in parallel using threads
         long startTime = System.currentTimeMillis();
         List<Future> futures = new LinkedList<>();
         for (Movie movie : movies) {
 
-            Runnable task = new TaskGetCreditsForMovie(movie);
+            Runnable task = new GetAndPersistCreditsForMovie(movie);
             futures.add(executor.submit(task));
 
             try {
-                Thread.sleep(DELAY_MILLISECONDS);
+                Thread.sleep(DELAY_MILLISECONDS); // Limits the number of requests made to TMDB per second
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
         }
-
-        // Wait for tasks to finish
         for (Future future : futures) {
             try {
-                future.get(); // blocking call
+                future.get(); // blocking call, waits for task to finish
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("Milliseconds it took: " + (System.currentTimeMillis() - startTime));
 
-        System.out.println("Time it took: " + (System.currentTimeMillis() - startTime));
 
         emf.close();
         executor.shutdown();
@@ -91,36 +90,31 @@ public class BuildMain {
     }
 
 
-    private static class TaskGetCreditsForMovie implements Runnable {
+    private static class GetAndPersistCreditsForMovie implements Runnable {
 
         private Movie movie;
 
-        TaskGetCreditsForMovie(Movie movie) {
+        GetAndPersistCreditsForMovie(Movie movie) {
             this.movie = movie;
         }
 
         @Override
         public void run() {
 
-            // Remember a person can be member twice in this movie
-            // Loop though members of this movie, create them as a person if they are not already created
             for (CreditDto c : TmdbService.getCreditsForMovie(movie.getId())) {
 
                 // Get or create person in database
                 Person person = personDao.update(new Person(c.personId(), c.name(), c.gender(), c.popularity(), null));
 
-                // Add credit to movie entity in memory
                 movie.addCredit(person, c.job(), c.character());
 
             }
 
             movieDao.update(movie);
-
             System.out.println(movie);
 
         }
 
     }
-
 
 }
