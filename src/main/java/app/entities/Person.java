@@ -5,7 +5,6 @@ import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
 
-//@EqualsAndHashCode
 @ToString
 @Getter
 @NoArgsConstructor

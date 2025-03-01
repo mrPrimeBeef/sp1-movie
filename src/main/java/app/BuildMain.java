@@ -52,7 +52,7 @@ public class BuildMain {
                     .filter(g -> m.genreIds().contains(g.getId()))
                     .collect(Collectors.toUnmodifiableSet());
 
-            Movie movie = new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.releaseDate(), genresForThisMovie, null, m.overview());
+            Movie movie = new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.releaseDate(), genresForThisMovie, m.overview());
             movieDao.create(movie);
             movies.add(movie);
         }

@@ -7,11 +7,9 @@ import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
 
-@EqualsAndHashCode(of = "id")
 @ToString
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class Movie {
     @Id
@@ -29,15 +27,24 @@ public class Movie {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "movie", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-    private Set<Credit> credits;
+    private Set<Credit> credits = new HashSet<>();
 
     @Column(length = 1000)
     private String overview;
 
+    public Movie(Integer id, String title, String originalTitle, boolean adult, String originalLanguage, double popularity, LocalDate releaseDate, Set<Genre> genres, String overview) {
+        this.id = id;
+        this.title = title;
+        this.originalTitle = originalTitle;
+        this.adult = adult;
+        this.originalLanguage = originalLanguage;
+        this.popularity = popularity;
+        this.releaseDate = releaseDate;
+        this.genres = genres;
+        this.overview = overview;
+    }
+
     public void addCredit(Person person, String job, String character) {
-        if (credits == null) {
-            credits = new HashSet<>();
-        }
         credits.add(new Credit(null, this, person, job, character));
     }
 
