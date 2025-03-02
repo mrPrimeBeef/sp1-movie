@@ -5,6 +5,8 @@ import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
 
+import app.enums.Gender;
+
 @ToString
 @Getter
 @NoArgsConstructor

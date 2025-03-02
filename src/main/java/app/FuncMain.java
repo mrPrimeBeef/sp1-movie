@@ -1,13 +1,14 @@
 package app;
 
+import java.util.List;
+
+import jakarta.persistence.EntityManagerFactory;
+
 import app.config.HibernateConfig;
 import app.daos.GenreDao;
 import app.daos.MovieDao;
 import app.daos.PersonDao;
 import app.entities.Movie;
-import jakarta.persistence.EntityManagerFactory;
-
-import java.util.List;
 
 public class FuncMain {
     public static void main(String[] args) {

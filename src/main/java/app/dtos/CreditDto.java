@@ -2,7 +2,7 @@ package app.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import app.entities.Gender;
+import app.enums.Gender;
 
 public record CreditDto(
         @JsonProperty("id")
