@@ -40,6 +40,9 @@ public class FuncMain {
         System.out.println("\nAll movies with genre 'Thriller': ");
         movieDao.readMoviesByGenre("Thriller").forEach(System.out::println);
 
+        System.out.println("\nAll movies with keyword 'marco' somewhere in title or original title: ");
+        movieDao.searchMoviesByKeywordInTitle("lov").forEach(System.out::println);
+
 //        System.out.println("All movies with genre comedy: " + movieDao.FindAllMoivesByGenre("Comedy"));
 //
 //        System.out.println(movieDao.searchMovieByString("wild men"));
