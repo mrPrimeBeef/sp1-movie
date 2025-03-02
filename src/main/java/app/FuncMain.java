@@ -43,12 +43,16 @@ public class FuncMain {
         System.out.println("\nAll movies with keyword 'lov' somewhere in title or original title: ");
         movieDao.searchMoviesByKeywordInTitleOrOrignalTitle("lov").forEach(System.out::println);
 
+        System.out.println("\nAverage rating of all movies: " + movieDao.getAverageRatingOfAllMovies());
 
-//        System.out.println("average rating for all movies in DB: " + movieDao.averageRatingOfAllMoviesInDB());
-//
-//        System.out.println("average rating for lowest rated movies in DB: " + movieDao.averageTop10LowestRating());
-//
-//        System.out.println("average rating for higst rated movies in DB: " + movieDao.averageTop10HigestRating());
+        System.out.println("\nTop 10 highest rated movies, with at least 100 votes:");
+        movieDao.getHighestRatedMovies(10).forEach(System.out::println);
+
+        System.out.println("\nTop 10 lowest rated movies, with at least 100 votes:");
+        movieDao.getLowestRatedMovies(10).forEach(System.out::println);
+
+        System.out.println("\nTop 10 most popular movies:");
+        movieDao.getMostPopularMovies(10).forEach(System.out::println);
 
 
         emf.close();

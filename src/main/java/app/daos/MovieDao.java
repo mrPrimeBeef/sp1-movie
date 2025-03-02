@@ -54,16 +54,59 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
             TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
             query.setParameter("title", "%" + keyword.toLowerCase() + "%");
             return query.getResultList();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
-    public Double averageRatingOfAllMoviesInDB() {
+    public Double getAverageRatingOfAllMovies() {
         try (EntityManager em = emf.createEntityManager()) {
-            String jqpl = "SELECT AVG(m.popularity) FROM Movie m";
+            String jqpl = "SELECT AVG(m.voteAverage) FROM Movie m WHERE m.voteCount>0";
             TypedQuery<Double> query = em.createQuery(jqpl, Double.class);
             return query.getSingleResult();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
+
+    public List<Movie> getHighestRatedMovies(int number) {
+        try (EntityManager em = emf.createEntityManager()) {
+            String jpql = "SELECT m FROM Movie m WHERE m.voteCount>=100 ORDER BY m.voteAverage DESC LIMIT :number";
+            TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
+            query.setParameter("number", number);
+            return query.getResultList();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Movie> getLowestRatedMovies(int number) {
+        try (EntityManager em = emf.createEntityManager()) {
+            String jpql = "SELECT m FROM Movie m WHERE m.voteCount>=100 ORDER BY m.voteAverage LIMIT :number";
+            TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
+            query.setParameter("number", number);
+            return query.getResultList();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Movie> getMostPopularMovies(int number) {
+        try (EntityManager em = emf.createEntityManager()) {
+            String jpql = "SELECT m FROM Movie m ORDER BY m.popularity DESC LIMIT :number";
+            TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
+            query.setParameter("number", number);
+            return query.getResultList();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     public Double averageTop10LowestRating() {
         try (EntityManager em = emf.createEntityManager()) {
