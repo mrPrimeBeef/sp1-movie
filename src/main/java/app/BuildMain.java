@@ -28,15 +28,15 @@ public class BuildMain {
     private static final MovieDao movieDao = MovieDao.getInstance(emf);
     private static final PersonDao personDao = PersonDao.getInstance(emf);
 
+    // TMDB says that approx. 40 requests per second are allowed: https://www.themoviedb.org/talk/66eb8e189bd4250430746c22
+    // To be on the safe side, this program limits to 30 requests per second
+    private static final int MAX_REQUESTS_PER_SECOND = 30;
+    private static final long DELAY_MILLISECONDS = 1000 / MAX_REQUESTS_PER_SECOND;
+
     public static void main(String[] args) {
 
         // Uses a fixed size thread pool. CachedThreadPool was tried, but was too fast for the database access
         ExecutorService executor = Executors.newFixedThreadPool(3);
-
-        // TMDB says that approx. 40 requests per second are allowed: https://www.themoviedb.org/talk/66eb8e189bd4250430746c22
-        // To be on the safe side, this program limits to 30 requests per second
-        int MAX_REQUESTS_PER_SECOND = 30;
-        long DELAY_MILLISECONDS = 1000 / MAX_REQUESTS_PER_SECOND;
 
         long startTime = System.currentTimeMillis();
 
