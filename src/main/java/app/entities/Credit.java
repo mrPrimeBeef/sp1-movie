@@ -13,9 +13,11 @@ public class Credit {
     private Integer id;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Movie movie;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Person person;
 
     private String job;
