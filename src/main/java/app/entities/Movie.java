@@ -15,7 +15,9 @@ public class Movie {
     @Id
     private Integer id;
 
+    @Column(nullable = false)
     private String title;
+
     private String originalTitle;
     private Boolean adult;
     private String originalLanguage;

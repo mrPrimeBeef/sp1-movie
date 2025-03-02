@@ -16,6 +16,7 @@ public class Person {
     @Id
     private Integer id;
 
+    @Column(nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
