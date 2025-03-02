@@ -19,4 +19,5 @@ public class GenreDao extends AbstractDao<Genre, Integer> {
         return instance;
     }
 
+
 }
