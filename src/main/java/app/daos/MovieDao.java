@@ -108,43 +108,5 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
     }
 
 
-    public Double averageTop10LowestRating() {
-        try (EntityManager em = emf.createEntityManager()) {
-            String jpql = "SELECT m FROM Movie m ORDER BY m.popularity ASC";
-            TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
-            query.setMaxResults(10);
-            List<Movie> top10LowestMovies = query.getResultList();
 
-            if (top10LowestMovies.isEmpty()) {
-                return 0.0;
-            }
-
-            double sum = 0.0;
-            for (Movie movie : top10LowestMovies) {
-                sum += movie.getPopularity();
-            }
-
-            return sum / top10LowestMovies.size();
-        }
-    }
-
-    public Double averageTop10HigestRating() {
-        try (EntityManager em = emf.createEntityManager()) {
-            String jpql = "SELECT m FROM Movie m ORDER BY m.popularity DESC";
-            TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
-            query.setMaxResults(10);
-            List<Movie> top10HigstMovies = query.getResultList();
-
-            if (top10HigstMovies.isEmpty()) {
-                return 0.0;
-            }
-
-            double sum = 0.0;
-            for (Movie movie : top10HigstMovies) {
-                sum += movie.getPopularity();
-            }
-
-            return sum / top10HigstMovies.size();
-        }
-    }
 }
