@@ -39,7 +39,7 @@ public class TmdbService {
     }
 
 
-    public static Set<MovieDto> getDanishMoviesSince2020() {
+    public static Set<MovieDto> getDanishMoviesSince2020(long delayMilliseconds) {
 
         Set<MovieDto> movies = new HashSet<>();
 
@@ -48,6 +48,8 @@ public class TmdbService {
         objectMapper.registerModule(new JavaTimeModule());
 
         for (int page = 1; ; page++) {
+
+            long startTime = System.currentTimeMillis();
 
             String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
             String json = ApiReader.getDataFromUrl(url);
@@ -66,6 +68,15 @@ public class TmdbService {
             if (response.results.size() < 20) {
                 break;
             }
+
+            long timeSpent = System.currentTimeMillis() - startTime;
+            long timeToSleep = Math.max(delayMilliseconds - timeSpent, 0);
+            try {
+                Thread.sleep(timeToSleep);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
 
         return movies;

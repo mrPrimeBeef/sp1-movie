@@ -38,37 +38,42 @@ public class BuildMain {
         // Uses a fixed size thread pool. CachedThreadPool was tried, but was too fast for the database access
         ExecutorService executor = Executors.newFixedThreadPool(3);
 
+        long startTime = System.currentTimeMillis();
+
         // Get all genres from TMDB and persist them in database
         Set<Genre> genres = new HashSet<>();
         for (GenreDto g : TmdbService.getGenres()) {
-            genres.add(genreDao.create(new Genre(g.id(), g.name())));
+            Genre genre = genreDao.create(new Genre(g.id(), g.name()));
+            genres.add(genre);
+            System.out.println("Got and persisted genre: " + genre);
         }
 
         // Get all danish movies since 2020 from TMDB and persist them in database
         Set<Movie> movies = new HashSet<>();
-        for (MovieDto m : TmdbService.getDanishMoviesSince2020()) {
+        for (MovieDto m : TmdbService.getDanishMoviesSince2020(DELAY_MILLISECONDS)) {
 
             Set<Genre> genresForThisMovie = genres.stream()
                     .filter(g -> m.genreIds().contains(g.getId()))
                     .collect(Collectors.toUnmodifiableSet());
 
             Movie movie = new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.releaseDate(), genresForThisMovie, m.overview());
-            movieDao.create(movie);
+            movie = movieDao.create(movie);
             movies.add(movie);
+            System.out.println("Got and persisted movie: " + movie);
         }
 
 
         // Loop through movies and get their credits from TMDB and persists them to database
         // This is done in parallel using threads
-        long startTime = System.currentTimeMillis();
         List<Future> futures = new LinkedList<>();
         for (Movie movie : movies) {
 
             Runnable task = new GetAndPersistCreditsForMovie(movie);
-            futures.add(executor.submit(task));
+            Future future = executor.submit(task);
+            futures.add(future);
 
             try {
-                Thread.sleep(DELAY_MILLISECONDS); // Limits the number of requests made to TMDB per second
+                Thread.sleep(DELAY_MILLISECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -81,8 +86,8 @@ public class BuildMain {
                 e.printStackTrace();
             }
         }
-        System.out.println("Milliseconds it took: " + (System.currentTimeMillis() - startTime));
 
+        System.out.println("Milliseconds it took: " + (System.currentTimeMillis() - startTime));
 
         emf.close();
         executor.shutdown();
@@ -111,8 +116,7 @@ public class BuildMain {
             }
 
             movieDao.update(movie);
-
-            System.out.println(movie);
+            System.out.println("Got and persisted credits for movie: " + movie);
 
         }
 
