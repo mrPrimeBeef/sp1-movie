@@ -13,6 +13,8 @@ public record MovieDto(Integer id,
                        @JsonProperty("original_language")
                        String originalLanguage,
                        Double popularity,
+                       @JsonProperty("vote_average")
+                       Double rating,
                        @JsonProperty("release_date")
                        LocalDate releaseDate,
                        @JsonProperty("genre_ids")

@@ -28,15 +28,15 @@ public class BuildMain {
     private static final MovieDao movieDao = MovieDao.getInstance(emf);
     private static final PersonDao personDao = PersonDao.getInstance(emf);
 
-    // TMDB says that approx. 40 requests per second are allowed: https://www.themoviedb.org/talk/66eb8e189bd4250430746c22
-    // To be on the safe side, this program limits to 30 requests per second
-    private static final int MAX_REQUESTS_PER_SECOND = 30;
-    private static final long DELAY_MILLISECONDS = 1000 / MAX_REQUESTS_PER_SECOND;
-
     public static void main(String[] args) {
 
         // Uses a fixed size thread pool. CachedThreadPool was tried, but was too fast for the database access
         ExecutorService executor = Executors.newFixedThreadPool(3);
+
+        // TMDB says that approx. 40 requests per second are allowed: https://www.themoviedb.org/talk/66eb8e189bd4250430746c22
+        // To be on the safe side, this program limits to 30 requests per second
+        int MAX_REQUESTS_PER_SECOND = 30;
+        long DELAY_MILLISECONDS = 1000 / MAX_REQUESTS_PER_SECOND;
 
         long startTime = System.currentTimeMillis();
 
@@ -56,14 +56,14 @@ public class BuildMain {
                     .filter(g -> m.genreIds().contains(g.getId()))
                     .collect(Collectors.toUnmodifiableSet());
 
-            Movie movie = new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.releaseDate(), genresForThisMovie, m.overview());
+            Movie movie = new Movie(m.id(), m.title(), m.originalTitle(), m.adult(), m.originalLanguage(), m.popularity(), m.rating(), m.releaseDate(), genresForThisMovie, m.overview());
             movie = movieDao.create(movie);
             movies.add(movie);
             System.out.println("Got and persisted movie: " + movie);
         }
 
 
-        // Loop through movies and get their credits from TMDB and persists them to database
+        // Loop through movies and get their credits from TMDB and persists them in database
         // This is done in parallel using threads
         List<Future> futures = new LinkedList<>();
         for (Movie movie : movies) {

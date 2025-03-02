@@ -19,7 +19,7 @@ public class Person {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private double popularity;
+    private Double popularity;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)

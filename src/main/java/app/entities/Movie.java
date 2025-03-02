@@ -17,9 +17,10 @@ public class Movie {
 
     private String title;
     private String originalTitle;
-    private boolean adult;
+    private Boolean adult;
     private String originalLanguage;
-    private double popularity;
+    private Double popularity;
+    private Double rating;
     private LocalDate releaseDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -32,13 +33,14 @@ public class Movie {
     @Column(length = 1000)
     private String overview;
 
-    public Movie(Integer id, String title, String originalTitle, boolean adult, String originalLanguage, double popularity, LocalDate releaseDate, Set<Genre> genres, String overview) {
+    public Movie(Integer id, String title, String originalTitle, boolean adult, String originalLanguage, double popularity, double rating, LocalDate releaseDate, Set<Genre> genres, String overview) {
         this.id = id;
         this.title = title;
         this.originalTitle = originalTitle;
         this.adult = adult;
         this.originalLanguage = originalLanguage;
         this.popularity = popularity;
+        this.rating = rating;
         this.releaseDate = releaseDate;
         this.genres = genres;
         this.overview = overview;
