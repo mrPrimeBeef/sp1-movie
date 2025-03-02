@@ -24,21 +24,27 @@ public class MovieDao extends AbstractDao<Movie, Integer> {
         return instance;
     }
 
-    public List<Genre> FindAllGenreByMovieTitle(String title) {
+    public List<Genre> readGenresByMovieTitle(String title) {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "SELECT g FROM Movie m JOIN m.genres g WHERE m.title = :title";
             TypedQuery query = em.createQuery(jpql, Genre.class);
             query.setParameter("title", title);
             return query.getResultList();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
-    public List<Movie> FindAllMoivesByGenre(String genre) {
+    public List<Movie> readMoviesByGenre(String genre) {
         try (EntityManager em = emf.createEntityManager()) {
             String jpql = "SELECT m FROM Movie m JOIN m.genres g WHERE g.name = :genre";
-            TypedQuery query = em.createQuery(jpql, Movie.class);
+            TypedQuery<Movie> query = em.createQuery(jpql, Movie.class);
             query.setParameter("genre", genre);
             return query.getResultList();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
