@@ -16,18 +16,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TestData extends TestSetUp {
-    public static List<Movie> convertJsonToMovieList(String json) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        MovieDTO[] dtos = objectMapper.readValue(json, MovieDTO[].class);
-        List<Movie> movies = Arrays.stream(dtos)
-                .map(TestData::convertDTOToMovie)
-                .collect(Collectors.toList());
-
-        return movies;
-    }
 
     public static void loadTestDataFromJson() {
         try {
@@ -73,6 +61,19 @@ public class TestData extends TestSetUp {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<Movie> convertJsonToMovieList(String json) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        MovieDTO[] dtos = objectMapper.readValue(json, MovieDTO[].class);
+        List<Movie> movies = Arrays.stream(dtos)
+                .map(TestData::convertDTOToMovie)
+                .collect(Collectors.toList());
+
+        return movies;
     }
 
     private static Movie convertDTOToMovie(MovieDTO dto) {

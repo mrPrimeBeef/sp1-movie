@@ -56,6 +56,55 @@ public class BuildMain {
         emf.close();
     }
 
+    private static HashSet<Director> addDirectors(List<Movie> movies, DirectorDao directorDao, MovieDao movieDao) {
+        HashSet<Director> allDirectorsInAllMovies = new HashSet<>();
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Map<Movie, Future<List<Director>>> futureMap = new HashMap<>();
+
+        // Start async tasks for hver film
+        for (Movie movie : movies) {
+            Future<List<Director>> future = executor.submit(() ->
+                    TmdbService.getDirectors(TmdbService.getCrewAndActorsDetails(movie.getTmdbId().toString()))
+            );
+            futureMap.put(movie, future);
+        }
+
+        // Hent resultaterne og tilføj instruktørerne til de rigtige film
+        for (Map.Entry<Movie, Future<List<Director>>> entry : futureMap.entrySet()) {
+            Movie movie = entry.getKey();
+            Future<List<Director>> future = entry.getValue();
+            try {
+                List<Director> directorsInThisMovie = future.get();
+                List<Director> managedDirectors = new ArrayList<>();
+                for (Director director : directorsInThisMovie) {
+                    Director managedDirector = directorDao.findById(Integer.parseInt(director.getTmdbId()));
+                    if (managedDirector == null) {
+                        managedDirector = directorDao.create(director);
+                    }
+                    managedDirectors.add(managedDirector);
+                }
+
+                movie.setDirectors(managedDirectors);
+                movieDao.update(movie);
+
+                allDirectorsInAllMovies.addAll(managedDirectors);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        return allDirectorsInAllMovies;
+    }
+
     private static void addActors(List<Movie> movies, ActorDao actorDao, MovieDao movieDao) {
         HashSet<Actor> allActorsInAllMovies = new HashSet<>();
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -122,55 +171,6 @@ public class BuildMain {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
-    }
-
-    private static HashSet<Director> addDirectors(List<Movie> movies, DirectorDao directorDao, MovieDao movieDao) {
-        HashSet<Director> allDirectorsInAllMovies = new HashSet<>();
-
-        ExecutorService executor = Executors.newCachedThreadPool();
-        Map<Movie, Future<List<Director>>> futureMap = new HashMap<>();
-
-        // Start async tasks for hver film
-        for (Movie movie : movies) {
-            Future<List<Director>> future = executor.submit(() ->
-                    TmdbService.getDirectors(TmdbService.getCrewAndActorsDetails(movie.getTmdbId().toString()))
-            );
-            futureMap.put(movie, future);
-        }
-
-        // Hent resultaterne og tilføj instruktørerne til de rigtige film
-        for (Map.Entry<Movie, Future<List<Director>>> entry : futureMap.entrySet()) {
-            Movie movie = entry.getKey();
-            Future<List<Director>> future = entry.getValue();
-            try {
-                List<Director> directorsInThisMovie = future.get();
-                List<Director> managedDirectors = new ArrayList<>();
-                for (Director director : directorsInThisMovie) {
-                    Director managedDirector = directorDao.findById(Integer.parseInt(director.getTmdbId()));
-                    if (managedDirector == null) {
-                        managedDirector = directorDao.create(director);
-                    }
-                    managedDirectors.add(managedDirector);
-                }
-
-                movie.setDirectors(managedDirectors);
-                movieDao.update(movie);
-
-                allDirectorsInAllMovies.addAll(managedDirectors);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
-        return allDirectorsInAllMovies;
     }
 
     public static void saveTestDataAsJson(List<Movie> movies) {
