@@ -31,6 +31,8 @@ public class TmdbService {
     private static final String ApiKey = Utils.getPropertyValue("API_KEY", "config.properties");
 
     public static List<Movie> getDanishMoviesSince2020(Map<Integer, Genre> genreMap) {
+        final int MAX_REQUESTS_PER_SECOND = 40;
+        final long REQUEST_INTERVAL_MS = 1000 / MAX_REQUESTS_PER_SECOND; // 25ms between requests
 
         ArrayList<Movie> movies = new ArrayList<>(1300);
 
@@ -40,9 +42,9 @@ public class TmdbService {
 
         try {
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
-            for (int page = 1;page < 4; page++) {
+            for (int page = 1;; page++) {
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
-                Future<String> json = scheduler.schedule(new CallableThread(url), page + 350, TimeUnit.MILLISECONDS);
+                Future<String> json = scheduler.schedule(new CallableThread(url), REQUEST_INTERVAL_MS, TimeUnit.MILLISECONDS);
 
                 MovieResponseDto response = objectMapper.readValue(json.get(), MovieResponseDto.class);
                 for (MovieResult r : response.results) {
