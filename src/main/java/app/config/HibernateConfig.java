@@ -25,16 +25,16 @@ public class HibernateConfig {
         return isTest;
     }
 
-    public static EntityManagerFactory getEntityManagerFactory() {
+    public static EntityManagerFactory getEntityManagerFactory(String createOrUpdate) {
         if (emf == null)
-            emf = createEMF(getTest());
+            emf = createEMF(getTest(),createOrUpdate);
         return emf;
     }
 
-    public static EntityManagerFactory getEntityManagerFactoryForTest() {
+    public static EntityManagerFactory getEntityManagerFactoryForTest(String somthing) {
         if (emfTest == null) {
             setTest(true);
-            emfTest = createEMF(getTest());  // No DB needed for test
+            emfTest = createEMF(getTest(), somthing);  // No DB needed for test
         }
         return emfTest;
     }
@@ -49,12 +49,12 @@ public class HibernateConfig {
 
     }
 
-    private static EntityManagerFactory createEMF(boolean forTest) {
+    private static EntityManagerFactory createEMF(boolean forTest, String createOrUpdate) {
         try {
             Configuration configuration = new Configuration();
             Properties props = new Properties();
             // Set the properties
-            setBaseProperties(props);
+            setBaseProperties(props, createOrUpdate);
             if (forTest) {
                 props = setTestProperties(props);
             } else if (System.getenv("DEPLOYED") != null) {
@@ -77,10 +77,10 @@ public class HibernateConfig {
         }
     }
 
-    private static Properties setBaseProperties(Properties props) {
+    private static Properties setBaseProperties(Properties props, String createOrUpdate) {
         props.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         props.put("hibernate.connection.driver_class", "org.postgresql.Driver");
-        props.put("hibernate.hbm2ddl.auto", "update");
+        props.put("hibernate.hbm2ddl.auto", createOrUpdate);
         props.put("hibernate.current_session_context_class", "thread");
         props.put("hibernate.show_sql", "false");
         props.put("hibernate.format_sql", "false");

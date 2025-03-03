@@ -22,7 +22,7 @@ import jakarta.persistence.Tuple;
 public class BuildMain {
     public static void main(String[] args) throws JsonProcessingException {
 
-        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+        EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory("create");
         GenreDao genreDao = GenreDao.getInstance(emf);
         MovieDao movieDao = MovieDao.getInstance(emf);
         ActorDao actorDao = ActorDao.getInstance(emf);
