@@ -40,7 +40,7 @@ public class TmdbService {
 
         try {
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
-            for (int page = 1;; page++) {
+            for (int page = 1;page < 4; page++) {
                 String url = "https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&primary_release_date.gte=2020-01-01&with_origin_country=DK&page=" + page + "&api_key=" + ApiKey;
                 Future<String> json = scheduler.schedule(new CallableThread(url), page + 350, TimeUnit.MILLISECONDS);
 

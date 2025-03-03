@@ -36,22 +36,41 @@ public class BuildMain {
         Map<Integer, Genre> genreMap = new HashMap<>();
         genres.forEach(g -> genreMap.put(g.getTmdbId(), g));
 
+        long startTime = System.nanoTime();
+
         System.out.println("Getting to Movies");
         // Get all movies from TMDB - we need genreMap to put genre entity inside movie entity
         List<Movie> movies = TmdbService.getDanishMoviesSince2020(genreMap);
         movies.forEach(movieDao::create);
 
+        long slutTimeMovie = System.nanoTime();
+        long varighedMovie = slutTimeMovie - startTime;
+
+        double varighedSekunderMovie = varighedMovie / 1_000_000_000.0;
+        System.out.println("point1 tog: " + varighedSekunderMovie + " sekunder");
+
         System.out.println("Getting to Directors");
         // Get Directors and add to DB and movies
         addDirectors(movies, directorDao, movieDao);
+
+        long slutTimeDirector = System.nanoTime();
+        long varighedDirector = slutTimeDirector - startTime;
+
+        double varighedSekunderDirector = varighedDirector / 1_000_000_000.0;
+        System.out.println("point2 tog: " + varighedSekunderDirector + " sekunder");
 
         System.out.println("Getting to actors");
         // Get Actors and add to DB and movies
         addActors(movies, actorDao,movieDao);
 
+        long slutTimeActor = System.nanoTime();
+        long varighedActor = slutTimeActor - startTime;
+
+        double varighedSekunderActor = varighedActor / 1_000_000_000.0;
+        System.out.println("point3 tog: " + varighedSekunderActor + " sekunder");
+
         // saveTestDataAsJson(movies);
 
-        System.out.println("Im here");
 
         emf.close();
     }
@@ -117,7 +136,6 @@ public class BuildMain {
             );
             futureMap.put(movie, future);
         }
-        System.out.println("Im here1");
 
         // Hent resultaterne og tilføj skuespillerne til de rigtige film
         for (Map.Entry<Movie, Future<List<ActorWithRole>>> entry : futureMap.entrySet()) {
@@ -150,18 +168,13 @@ public class BuildMain {
                 if (movie.getJoins() == null) {
                     movie.setJoins(new HashSet<>());
                 }
-
-                System.out.println("Im here2");
                 movie.getJoins().addAll(joins);
-                System.out.println("Im here3");
                 movieDao.update(movie);
-                System.out.println("Im here4");
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
-        System.out.println("Shoutdown");
         executor.shutdown();
         try {
             if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
