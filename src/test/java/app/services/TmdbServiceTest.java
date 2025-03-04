@@ -31,7 +31,6 @@ public class TmdbServiceTest {
                     .filter(g -> g.id() == 99)
                     .findFirst()
                     .orElse(null);
-            ;
 
             assertEquals("Documentary", genreDto.name());
 
@@ -47,7 +46,7 @@ public class TmdbServiceTest {
 
             Set<MovieDto> movieDtos = TmdbService.getDanishMoviesSince2020(DELAY_MILLISECONDS);
             System.out.println(movieDtos.size());
-            assertTrue(movieDtos.size() > 1200);
+            assertTrue(movieDtos.size() >= 1294);
 
             MovieDto movieDto = movieDtos.stream()
                     .filter(m -> m.id() == 1275299)
@@ -72,7 +71,6 @@ public class TmdbServiceTest {
                     .filter(c -> c.personId() == 4455)
                     .findFirst()
                     .orElse(null);
-            ;
 
             assertEquals("Ulrich Thomsen", creditDto.name());
             assertEquals(Gender.MAN, creditDto.gender());
